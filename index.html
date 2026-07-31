@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>3D Shooter Web Game - Zombies & Gun</title>
+  <title>3D Shooter Web Game</title>
   <style>
     * {
       box-sizing: border-box;
@@ -13,6 +13,7 @@
       -webkit-user-select: none;
     }
 
+    /* Force Landscape Screen Orientation */
     html, body {
       width: 100vw;
       height: 100vh;
@@ -29,20 +30,18 @@
       left: 0;
     }
 
-    /* Scoreboard UI */
-    #score-board {
+    /* Crosshair (+) in Center */
+    #crosshair {
       position: absolute;
-      top: 20px;
-      left: 30px;
-      background: rgba(0, 0, 0, 0.6);
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 18px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 28px;
       font-weight: bold;
-      border: 1px solid rgba(255,255,255,0.2);
       pointer-events: none;
-      backdrop-filter: blur(4px);
+      z-index: 10;
+      text-shadow: 0 0 4px #000;
     }
 
     /* UI Overlay Layer */
@@ -82,7 +81,7 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
-    /* Action Buttons */
+    /* Action Controls Container */
     .action-btn {
       position: absolute;
       background: rgba(0, 0, 0, 0.5);
@@ -105,38 +104,87 @@
       transform: scale(0.92);
     }
 
-    /* Button Placements */
-    #btn-fire {
-      bottom: 110px;
-      right: 40px;
-      width: 75px;
-      height: 75px;
-      background: rgba(239, 68, 68, 0.7);
-      font-size: 15px;
-    }
-
+    /* Buttons Placement */
     #btn-jump {
-      bottom: 150px;
-      right: 135px;
-      width: 60px;
-      height: 60px;
+      bottom: 120px;
+      right: 50px;
+      width: 55px;
+      height: 55px;
       background: rgba(59, 130, 246, 0.6);
     }
 
     #btn-sit {
-      bottom: 35px;
+      bottom: 25px;
       right: 50px;
-      width: 60px;
-      height: 60px;
+      width: 55px;
+      height: 55px;
       background: rgba(234, 179, 8, 0.6);
     }
 
     #btn-lie {
-      bottom: 35px;
+      bottom: 25px;
       right: 125px;
-      width: 60px;
-      height: 60px;
-      background: rgba(168, 85, 247, 0.6);
+      width: 55px;
+      height: 55px;
+      background: rgba(239, 68, 68, 0.6);
+    }
+
+    /* Fire Button in Center of Action Cluster */
+    #btn-fire {
+      bottom: 70px;
+      right: 120px;
+      width: 70px;
+      height: 70px;
+      background: rgba(220, 38, 38, 0.8);
+      border-color: #fca5a5;
+      font-size: 15px;
+    }
+
+    /* Bottom Health (HP) Bar */
+    #hp-container {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      height: 22px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      border-radius: 12px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    #hp-bar {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, #ef4444, #22c55e);
+      transition: width 0.2s ease;
+    }
+
+    #hp-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 11px;
+      font-weight: bold;
+      text-shadow: 0 0 3px #000;
+    }
+
+    /* Score Board */
+    #score-board {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #fff;
+      background: rgba(0,0,0,0.5);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 16px;
+      border: 1px solid rgba(255,255,255,0.2);
     }
 
     /* Landscape Warning Mask */
@@ -171,31 +219,42 @@
 
   <div id="portrait-warning">
     <h2>🔄 Kripya Phone ko Horizontal (Landscape) Karein</h2>
-    <p style="margin-top: 10px; color: #94a3b8;">Accha shooting experience paane ke liye screen rotate karein.</p>
+    <p style="margin-top: 10px; color: #94a3b8;">Accha gaming experience paane ke liye screen rotate karein.</p>
   </div>
 
   <div id="canvas-container"></div>
+  
+  <!-- Crosshair (+) Icon -->
+  <div id="crosshair">+</div>
 
-  <div id="score-board">Zombies Kills: <span id="score">0</span></div>
+  <div id="score-board">Kills: <span id="score">0</span></div>
 
   <!-- UI Touch Controls -->
   <div id="ui-layer">
+    <!-- Left Joystick -->
     <div id="joystick-container">
       <div id="joystick-knob"></div>
     </div>
 
-    <div id="btn-fire" class="action-btn">FIRE</div>
+    <!-- Right Action Buttons -->
     <div id="btn-jump" class="action-btn">JUMP</div>
     <div id="btn-sit" class="action-btn">SIT</div>
     <div id="btn-lie" class="action-btn">LIE</div>
+    <div id="btn-fire" class="action-btn">FIRE</div>
+
+    <!-- Bottom HP Bar -->
+    <div id="hp-container">
+      <div id="hp-bar"></div>
+      <div id="hp-text">HP: 100 / 100</div>
+    </div>
   </div>
 
   <script>
-    // --- SCENE SETUP ---
+    // --- 3D SCENE SETUP ---
     const container = document.getElementById('canvas-container');
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1e293b); // Dark moody environment
-    scene.fog = new THREE.FogExp2(0x1e293b, 0.02);
+    scene.background = new THREE.Color(0x111827); // Dark Night Atmosphere
+    scene.fog = new THREE.FogExp2(0x111827, 0.015);
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -207,26 +266,51 @@
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
-    dirLight.position.set(30, 50, 30);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(40, 60, 20);
     dirLight.castShadow = true;
     scene.add(dirLight);
 
-    // --- GROUND & ENVIRONMENT ---
+    // --- GROUND / ENVIRONMENT ---
     const groundGeo = new THREE.PlaneGeometry(300, 300);
-    const groundMat = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.9 });
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.8 });
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
     scene.add(ground);
 
+    // Simple Trees
+    function createTree(x, z) {
+      const group = new THREE.Group();
+      const trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.4, 0.6, 3),
+        new THREE.MeshStandardMaterial({ color: 0x371b07 })
+      );
+      trunk.position.y = 1.5;
+      group.add(trunk);
+
+      const leaves = new THREE.Mesh(
+        new THREE.ConeGeometry(2.5, 5, 8),
+        new THREE.MeshStandardMaterial({ color: 0x064e3b })
+      );
+      leaves.position.y = 4.5;
+      group.add(leaves);
+
+      group.position.set(x, 0, z);
+      scene.add(group);
+    }
+
+    for (let i = 0; i < 35; i++) {
+      createTree((Math.random() - 0.5) * 200, (Math.random() - 0.5) * 200);
+    }
+
     // --- CHARACTER SETUP ---
     const characterGroup = new THREE.Group();
     scene.add(characterGroup);
 
-    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6 });
+    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x2563eb });
     const skinMat = new THREE.MeshStandardMaterial({ color: 0xffdbac });
-    const pantMat = new THREE.MeshStandardMaterial({ color: 0x334155 });
+    const pantMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
 
     // Torso
     const torso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), bodyMat);
@@ -247,79 +331,66 @@
     rightLeg.position.set(0.25, 0.5, 0);
     characterGroup.add(rightLeg);
 
-    // --- 3D GUN SETUP ---
-    const gunGroup = new THREE.Group();
-    const gunMat = new THREE.MeshStandardMaterial({ color: 0x111827, metalness: 0.8, roughness: 0.2 });
-    const gunBody = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.2, 0.8), gunMat);
-    gunBody.position.set(0.35, 1.3, -0.4);
-    gunGroup.add(gunBody);
-    characterGroup.add(gunGroup);
+    // 3D Gun Attachment
+    const gun = new THREE.Mesh(
+      new THREE.BoxGeometry(0.15, 0.15, 0.7),
+      new THREE.MeshStandardMaterial({ color: 0x000000 })
+    );
+    gun.position.set(0.4, 1.3, -0.3);
+    characterGroup.add(gun);
 
-    // Player State
+    // Character State
     const playerState = {
       y: 0,
       velocityY: 0,
       isGrounded: true,
       mode: 'stand',
       targetScaleY: 1,
-      targetRotationX: 0
+      targetRotationX: 0,
+      hp: 100,
+      maxHp: 100
     };
 
-    // --- ZOMBIES SYSTEM ---
-    const zombies = [];
-    let score = 0;
+    // --- CAMERA ROTATION (SWIPE) LOGIC ---
+    let cameraAngleYaw = 0;   // Horizontal rotation
+    let cameraAnglePitch = 0.3; // Vertical rotation
+    let isSwiping = false;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
 
-    function spawnZombie() {
-      const zombieGroup = new THREE.Group();
-      const zMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.8 }); // Greenish Zombie skin
-      const zClothMat = new THREE.MeshStandardMaterial({ color: 0x7f1d1d }); // Torn red-ish cloth
+    window.addEventListener('touchstart', (e) => {
+      for (let i = 0; i < e.touches.length; i++) {
+        const touch = e.touches[i];
+        // Only swipe camera if touch is on right half of screen
+        if (touch.clientX > window.innerWidth / 2) {
+          isSwiping = true;
+          lastTouchX = touch.clientX;
+          lastTouchY = touch.clientY;
+        }
+      }
+    });
 
-      const zTorso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), zClothMat);
-      zTorso.position.y = 1.2;
-      zombieGroup.add(zTorso);
+    window.addEventListener('touchmove', (e) => {
+      if (!isSwiping) return;
+      for (let i = 0; i < e.touches.length; i++) {
+        const touch = e.touches[i];
+        if (touch.clientX > window.innerWidth / 3) {
+          const deltaX = touch.clientX - lastTouchX;
+          const deltaY = touch.clientY - lastTouchY;
 
-      const zHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 12, 12), zMat);
-      zHead.position.y = 2.0;
-      zombieGroup.add(zHead);
+          cameraAngleYaw -= deltaX * 0.005;
+          cameraAnglePitch += deltaY * 0.003;
+          cameraAnglePitch = Math.max(0.05, Math.min(Math.PI / 2.5, cameraAnglePitch)); // Clamp vertical angle
 
-      // Random spawn position around player
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 40 + Math.random() * 30;
-      zombieGroup.position.set(Math.cos(angle) * dist, 0, Math.sin(angle) * dist);
+          lastTouchX = touch.clientX;
+          lastTouchY = touch.clientY;
+        }
+      }
+    });
 
-      scene.add(zombieGroup);
-      zombies.push(zombieGroup);
-    }
+    window.addEventListener('touchend', () => { isSwiping = false; });
 
-    // Spawn 10 Initial Zombies
-    for (let i = 0; i < 10; i++) {
-      spawnZombie();
-    }
-
-    // --- BULLETS SYSTEM ---
-    const bullets = [];
-
-    function shootBullet() {
-      const bulletGeo = new THREE.SphereGeometry(0.12, 8, 8);
-      const bulletMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 }); // Glowing yellow bullet
-      const bullet = new THREE.Mesh(bulletGeo, bulletMat);
-
-      // Bullet start position (at character position & facing angle)
-      bullet.position.set(
-        characterGroup.position.x,
-        characterGroup.position.y + 1.3,
-        characterGroup.position.z
-      );
-
-      // Direction vector based on character rotation
-      const dir = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), characterGroup.rotation.y);
-      bullet.velocity = dir.multiplyScalar(0.8);
-
-      scene.add(bullet);
-      bullets.push(bullet);
-    }
-
-    // --- CONTROLS LOGIC ---
+    // --- JOYSTICK LOGIC ---
     let joystickInput = { x: 0, y: 0 };
     const joystickContainer = document.getElementById('joystick-container');
     const joystickKnob = document.getElementById('joystick-knob');
@@ -342,9 +413,12 @@
       const dist = Math.min(Math.hypot(dx, dy), 45);
       const angle = Math.atan2(dy, dx);
 
-      joystickKnob.style.transform = `translate(calc(-50% + ${Math.cos(angle) * dist}px), calc(-50% + ${Math.sin(angle) * dist}px))`;
-      joystickInput.x = (Math.cos(angle) * dist) / 45;
-      joystickInput.y = (Math.sin(angle) * dist) / 45;
+      const knobX = Math.cos(angle) * dist;
+      const knobY = Math.sin(angle) * dist;
+
+      joystickKnob.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`;
+      joystickInput.x = knobX / 45;
+      joystickInput.y = knobY / 45;
     }
 
     function handleJoystickEnd() {
@@ -356,12 +430,69 @@
     joystickContainer.addEventListener('touchstart', handleJoystickStart);
     window.addEventListener('touchmove', handleJoystickMove);
     window.addEventListener('touchend', handleJoystickEnd);
+
+    // Mouse Fallbacks for Testing
     joystickContainer.addEventListener('mousedown', handleJoystickStart);
     window.addEventListener('mousemove', (e) => { if (joystickActive) handleJoystickMove(e); });
     window.addEventListener('mouseup', handleJoystickEnd);
 
-    // Action Buttons Listeners
-    document.getElementById('btn-fire').addEventListener('touchstart', (e) => { e.preventDefault(); shootBullet(); });
+    // --- ZOMBIES SYSTEM ---
+    const zombies = [];
+    let kills = 0;
+
+    function spawnZombie() {
+      const zombieGroup = new THREE.Group();
+      const zMat = new THREE.MeshStandardMaterial({ color: 0x16a34a }); // Green Zombie skin
+      const zClothMat = new THREE.MeshStandardMaterial({ color: 0x991b1b });
+
+      const zTorso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), zClothMat);
+      zTorso.position.y = 1.2;
+      zombieGroup.add(zTorso);
+
+      const zHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 12, 12), zMat);
+      zHead.position.y = 2.0;
+      zombieGroup.add(zHead);
+
+      // Random Spawn Around Player
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 35 + Math.random() * 25;
+      zombieGroup.position.set(
+        characterGroup.position.x + Math.cos(angle) * dist,
+        0,
+        characterGroup.position.z + Math.sin(angle) * dist
+      );
+
+      scene.add(zombieGroup);
+      zombies.push(zombieGroup);
+    }
+
+    for (let i = 0; i < 8; i++) spawnZombie();
+
+    // --- BULLETS & SHOOTING SYSTEM ---
+    const bullets = [];
+
+    function shoot() {
+      const bulletGeo = new THREE.SphereGeometry(0.12, 8, 8);
+      const bulletMat = new THREE.MeshBasicMaterial({ color: 0xfde047 });
+      const bullet = new THREE.Mesh(bulletGeo, bulletMat);
+
+      bullet.position.set(
+        characterGroup.position.x,
+        characterGroup.position.y + 1.4,
+        characterGroup.position.z
+      );
+
+      // Shoot in direction of Camera Aim (+ Crosshair)
+      const aimDir = new THREE.Vector3();
+      camera.getWorldDirection(aimDir);
+
+      bullet.velocity = aimDir.multiplyScalar(0.9);
+      scene.add(bullet);
+      bullets.push(bullet);
+    }
+
+    // --- BUTTON CONTROLS ---
+    document.getElementById('btn-fire').addEventListener('touchstart', (e) => { e.preventDefault(); shoot(); });
     document.getElementById('btn-jump').addEventListener('touchstart', (e) => {
       e.preventDefault();
       if (playerState.isGrounded && playerState.mode !== 'lie') {
@@ -387,12 +518,12 @@
       let moveSpeed = 0.12;
       if (playerState.mode === 'sit') { playerState.targetScaleY = 0.55; moveSpeed = 0.05; playerState.targetRotationX = 0; }
       else if (playerState.mode === 'lie') { playerState.targetScaleY = 0.25; moveSpeed = 0.03; playerState.targetRotationX = -Math.PI / 2.3; }
-      else { playerState.targetScaleY = 1.0; moveSpeed = 0.12; playerState.targetRotationX = 0; }
+      else { playerState.targetScaleY = 1.0; playerState.targetRotationX = 0; }
 
       characterGroup.scale.y += (playerState.targetScaleY - characterGroup.scale.y) * 0.15;
       characterGroup.rotation.x += (playerState.targetRotationX - characterGroup.rotation.x) * 0.15;
 
-      // Gravity
+      // Gravity & Jumping
       if (!playerState.isGrounded) {
         playerState.y += playerState.velocityY;
         playerState.velocityY -= 0.01;
@@ -400,13 +531,21 @@
       }
       characterGroup.position.y = playerState.y;
 
-      // Joystick Movement
+      // Joystick Relative to Camera Rotation
       if (Math.abs(joystickInput.x) > 0.1 || Math.abs(joystickInput.y) > 0.1) {
-        const moveX = joystickInput.x * moveSpeed;
-        const moveZ = joystickInput.y * moveSpeed;
-        characterGroup.position.x += moveX;
-        characterGroup.position.z += moveZ;
-        characterGroup.rotation.y = Math.atan2(moveX, moveZ);
+        const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
+        const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
+
+        const moveDir = new THREE.Vector3()
+          .addScaledVector(right, joystickInput.x)
+          .addScaledVector(forward, joystickInput.y)
+          .normalize();
+
+        characterGroup.position.x += moveDir.x * moveSpeed;
+        characterGroup.position.z += moveDir.z * moveSpeed;
+
+        // Character faces movement direction
+        characterGroup.rotation.y = Math.atan2(moveDir.x, moveDir.z);
       }
 
       // Update Bullets
@@ -414,42 +553,56 @@
         const b = bullets[i];
         b.position.add(b.velocity);
 
-        // Check collision with Zombies
+        // Bullet vs Zombie Collision
         for (let j = zombies.length - 1; j >= 0; j--) {
           const z = zombies[j];
-          if (b.position.distanceTo(z.position) < 1.5) {
-            // Hit! Remove bullet and zombie, spawn new zombie & update score
+          if (b.position.distanceTo(z.position) < 1.4) {
             scene.remove(z);
             zombies.splice(j, 1);
             scene.remove(b);
             bullets.splice(i, 1);
 
-            score += 1;
-            document.getElementById('score').innerText = score;
+            kills++;
+            document.getElementById('score').innerText = kills;
             spawnZombie();
             break;
           }
         }
 
-        // Remove bullet if too far
-        if (b && b.position.distanceTo(characterGroup.position) > 80) {
+        if (b && b.position.distanceTo(characterGroup.position) > 90) {
           scene.remove(b);
           bullets.splice(i, 1);
         }
       }
 
-      // Update Zombies (Move towards player)
+      // Update Zombies & Attack Player Logic
       zombies.forEach(z => {
         const dir = new THREE.Vector3().subVectors(characterGroup.position, z.position).normalize();
-        z.position.add(dir.multiplyScalar(0.04)); // Zombie speed
+        z.position.add(dir.multiplyScalar(0.035));
         z.lookAt(characterGroup.position.x, z.position.y, characterGroup.position.z);
+
+        // Zombie attack player if close
+        if (z.position.distanceTo(characterGroup.position) < 1.2) {
+          playerState.hp = Math.max(0, playerState.hp - 0.25);
+          document.getElementById('hp-bar').style.width = playerState.hp + '%';
+          document.getElementById('hp-text').innerText = `HP: ${Math.ceil(playerState.hp)} / 100`;
+
+          if (playerState.hp <= 0) {
+            alert('Game Over! Restarting game...');
+            playerState.hp = 100;
+            kills = 0;
+            document.getElementById('score').innerText = 0;
+            characterGroup.position.set(0, 0, 0);
+          }
+        }
       });
 
-      // Smooth Camera Follow
-      const cameraOffset = new THREE.Vector3(0, 5, 10);
-      const targetCamPos = characterGroup.position.clone().add(cameraOffset);
-      camera.position.lerp(targetCamPos, 0.1);
-      camera.lookAt(characterGroup.position.x, characterGroup.position.y + 1, characterGroup.position.z);
+      // Camera Orbit Around Player
+      const camDist = 8;
+      camera.position.x = characterGroup.position.x + camDist * Math.sin(cameraAngleYaw) * Math.cos(cameraAnglePitch);
+      camera.position.y = characterGroup.position.y + camDist * Math.sin(cameraAnglePitch) + 1.5;
+      camera.position.z = characterGroup.position.z + camDist * Math.cos(cameraAngleYaw) * Math.cos(cameraAnglePitch);
+      camera.lookAt(characterGroup.position.x, characterGroup.position.y + 1.2, characterGroup.position.z);
 
       renderer.render(scene, camera);
     }
