@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>3D Shooter Web Game</title>
+  <title>3D PUBG-Style Zombie Shooter</title>
   <style>
     * {
       box-sizing: border-box;
@@ -13,7 +13,6 @@
       -webkit-user-select: none;
     }
 
-    /* Force Landscape Screen Orientation */
     html, body {
       width: 100vw;
       height: 100vh;
@@ -30,21 +29,26 @@
       left: 0;
     }
 
-    /* Crosshair (+) in Center */
+    /* PUBG Style Clean Crosshair */
     #crosshair {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      color: rgba(255, 255, 255, 0.85);
-      font-size: 28px;
-      font-weight: bold;
+      width: 16px;
+      height: 16px;
       pointer-events: none;
-      z-index: 10;
-      text-shadow: 0 0 4px #000;
+      z-index: 20;
     }
+    #crosshair::before, #crosshair::after {
+      content: '';
+      position: absolute;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 3px #000;
+    }
+    #crosshair::before { top: 7px; left: 0; width: 16px; height: 2px; }
+    #crosshair::after { top: 0; left: 7px; width: 2px; height: 16px; }
 
-    /* UI Overlay Layer */
     #ui-layer {
       position: absolute;
       top: 0;
@@ -54,17 +58,17 @@
       pointer-events: none;
     }
 
-    /* Left Side Joystick */
+    /* Left Joystick */
     #joystick-container {
       position: absolute;
       bottom: 30px;
       left: 40px;
-      width: 130px;
-      height: 130px;
+      width: 125px;
+      height: 125px;
       background: rgba(255, 255, 255, 0.15);
       border: 2px solid rgba(255, 255, 255, 0.4);
       border-radius: 50%;
-      backdrop-filter: blur(5px);
+      backdrop-filter: blur(4px);
       pointer-events: auto;
       touch-action: none;
     }
@@ -73,20 +77,20 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 50px;
-      height: 50px;
-      background: rgba(255, 255, 255, 0.8);
+      width: 48px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.85);
       border-radius: 50%;
       transform: translate(-50%, -50%);
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
-    /* Action Controls Container */
+    /* Action Buttons */
     .action-btn {
       position: absolute;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.55);
       color: #fff;
-      border: 2px solid rgba(255, 255, 255, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.7);
       border-radius: 50%;
       display: flex;
       justify-content: center;
@@ -100,57 +104,56 @@
     }
 
     .action-btn:active {
-      background: rgba(74, 222, 128, 0.8);
+      background: rgba(74, 222, 128, 0.85);
       transform: scale(0.92);
     }
 
-    /* Buttons Placement */
+    /* Repositioned Buttons with Proper Spacing */
+    #btn-fire {
+      bottom: 85px;
+      right: 125px;
+      width: 72px;
+      height: 72px;
+      background: rgba(220, 38, 38, 0.85);
+      border-color: #fca5a5;
+      font-size: 15px;
+    }
+
     #btn-jump {
-      bottom: 120px;
-      right: 50px;
-      width: 55px;
-      height: 55px;
-      background: rgba(59, 130, 246, 0.6);
+      bottom: 140px;
+      right: 40px;
+      width: 58px;
+      height: 58px;
+      background: rgba(59, 130, 246, 0.65);
     }
 
     #btn-sit {
       bottom: 25px;
-      right: 50px;
-      width: 55px;
-      height: 55px;
-      background: rgba(234, 179, 8, 0.6);
+      right: 40px;
+      width: 58px;
+      height: 58px;
+      background: rgba(234, 179, 8, 0.65);
     }
 
     #btn-lie {
       bottom: 25px;
       right: 125px;
-      width: 55px;
-      height: 55px;
-      background: rgba(239, 68, 68, 0.6);
+      width: 58px;
+      height: 58px;
+      background: rgba(168, 85, 247, 0.65);
     }
 
-    /* Fire Button in Center of Action Cluster */
-    #btn-fire {
-      bottom: 70px;
-      right: 120px;
-      width: 70px;
-      height: 70px;
-      background: rgba(220, 38, 38, 0.8);
-      border-color: #fca5a5;
-      font-size: 15px;
-    }
-
-    /* Bottom Health (HP) Bar */
+    /* HP Bar */
     #hp-container {
       position: absolute;
       bottom: 15px;
       left: 50%;
       transform: translateX(-50%);
-      width: 260px;
-      height: 22px;
+      width: 250px;
+      height: 20px;
       background: rgba(0, 0, 0, 0.7);
       border: 2px solid rgba(255, 255, 255, 0.6);
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
       pointer-events: none;
     }
@@ -159,7 +162,7 @@
       width: 100%;
       height: 100%;
       background: linear-gradient(90deg, #ef4444, #22c55e);
-      transition: width 0.2s ease;
+      transition: width 0.15s ease;
     }
 
     #hp-text {
@@ -173,76 +176,63 @@
       text-shadow: 0 0 3px #000;
     }
 
-    /* Score Board */
-    #score-board {
+    /* HUD Stats */
+    #hud-panel {
       position: absolute;
-      top: 20px;
+      top: 15px;
       left: 20px;
+      background: rgba(0, 0, 0, 0.6);
       color: #fff;
-      background: rgba(0,0,0,0.5);
-      padding: 8px 16px;
-      border-radius: 8px;
+      padding: 10px 16px;
+      border-radius: 10px;
       font-weight: bold;
-      font-size: 16px;
-      border: 1px solid rgba(255,255,255,0.2);
+      font-size: 15px;
+      border: 1px solid rgba(255,255,255,0.25);
+      line-height: 1.4;
     }
 
-    /* Landscape Warning Mask */
     @media screen and (orientation: portrait) {
-      #portrait-warning {
-        display: flex !important;
-      }
+      #portrait-warning { display: flex !important; }
     }
 
     #portrait-warning {
       display: none;
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #0f172a;
-      color: #fff;
-      z-index: 9999;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 20px;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #0f172a; color: #fff; z-index: 9999;
+      flex-direction: column; justify-content: center; align-items: center;
+      text-align: center; padding: 20px;
     }
   </style>
   
-  <!-- Three.js 3D Engine -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
   <div id="portrait-warning">
-    <h2>🔄 Kripya Phone ko Horizontal (Landscape) Karein</h2>
-    <p style="margin-top: 10px; color: #94a3b8;">Accha gaming experience paane ke liye screen rotate karein.</p>
+    <h2>🔄 Kripya Screen Landscape Karein</h2>
+    <p style="margin-top: 8px; color: #94a3b8;">Gaming experience ke liye phone rotate karein.</p>
   </div>
 
   <div id="canvas-container"></div>
   
-  <!-- Crosshair (+) Icon -->
-  <div id="crosshair">+</div>
+  <div id="crosshair"></div>
 
-  <div id="score-board">Kills: <span id="score">0</span></div>
+  <div id="hud-panel">
+    <div>🎯 Kills: <span id="score" style="color:#4ade80;">0</span></div>
+    <div>🧟 Zombies Remaining: <span id="z-left" style="color:#f87171;">50</span></div>
+  </div>
 
-  <!-- UI Touch Controls -->
   <div id="ui-layer">
-    <!-- Left Joystick -->
     <div id="joystick-container">
       <div id="joystick-knob"></div>
     </div>
 
-    <!-- Right Action Buttons -->
+    <div id="btn-fire" class="action-btn">FIRE</div>
     <div id="btn-jump" class="action-btn">JUMP</div>
     <div id="btn-sit" class="action-btn">SIT</div>
     <div id="btn-lie" class="action-btn">LIE</div>
-    <div id="btn-fire" class="action-btn">FIRE</div>
 
-    <!-- Bottom HP Bar -->
     <div id="hp-container">
       <div id="hp-bar"></div>
       <div id="hp-text">HP: 100 / 100</div>
@@ -250,11 +240,28 @@
   </div>
 
   <script>
+    // --- AUDIO SYNTHESIZER (No External Files Required) ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playGunSound() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.15);
+    }
+
     // --- 3D SCENE SETUP ---
     const container = document.getElementById('canvas-container');
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x111827); // Dark Night Atmosphere
-    scene.fog = new THREE.FogExp2(0x111827, 0.015);
+    scene.background = new THREE.Color(0x7dd3fc); // Bright Sky Blue
+    scene.fog = new THREE.FogExp2(0x7dd3fc, 0.008);
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -262,67 +269,100 @@
     renderer.shadowMap.enabled = true;
     container.appendChild(renderer.domElement);
 
-    // --- LIGHTS ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    // --- LIGHTS & SUN ---
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    dirLight.position.set(40, 60, 20);
-    dirLight.castShadow = true;
-    scene.add(dirLight);
+    const sunLight = new THREE.DirectionalLight(0xfffbe1, 1.2);
+    sunLight.position.set(60, 100, 40);
+    sunLight.castShadow = true;
+    scene.add(sunLight);
 
-    // --- GROUND / ENVIRONMENT ---
-    const groundGeo = new THREE.PlaneGeometry(300, 300);
-    const groundMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.8 });
+    // Sun Visual Mesh
+    const sunMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(6, 16, 16),
+      new THREE.MeshBasicMaterial({ color: 0xfde047 })
+    );
+    sunMesh.position.set(120, 200, 80);
+    scene.add(sunMesh);
+
+    // --- ENVIRONMENT (Land, River, Trees, Stones, Birds) ---
+    const groundGeo = new THREE.PlaneGeometry(400, 400);
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x48a832, roughness: 0.8 });
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
     scene.add(ground);
 
-    // Simple Trees
-    function createTree(x, z) {
-      const group = new THREE.Group();
-      const trunk = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.4, 0.6, 3),
-        new THREE.MeshStandardMaterial({ color: 0x371b07 })
-      );
-      trunk.position.y = 1.5;
-      group.add(trunk);
+    // River
+    const river = new THREE.Mesh(
+      new THREE.PlaneGeometry(30, 400),
+      new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.2 })
+    );
+    river.rotation.x = -Math.PI / 2;
+    river.position.set(-60, 0.1, 0);
+    scene.add(river);
 
-      const leaves = new THREE.Mesh(
-        new THREE.ConeGeometry(2.5, 5, 8),
-        new THREE.MeshStandardMaterial({ color: 0x064e3b })
-      );
-      leaves.position.y = 4.5;
-      group.add(leaves);
+    // Trees & Stones
+    function populateWorld() {
+      for (let i = 0; i < 45; i++) {
+        const x = (Math.random() - 0.5) * 320;
+        const z = (Math.random() - 0.5) * 320;
+        if (Math.abs(x - (-60)) < 25) continue; // Keep out of river
 
-      group.position.set(x, 0, z);
-      scene.add(group);
+        // Tree
+        const tree = new THREE.Group();
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.6, 3), new THREE.MeshStandardMaterial({ color: 0x5c4033 }));
+        trunk.position.y = 1.5;
+        tree.add(trunk);
+        const leaves = new THREE.Mesh(new THREE.ConeGeometry(2.5, 5, 8), new THREE.MeshStandardMaterial({ color: 0x16a34a }));
+        leaves.position.y = 4.5;
+        tree.add(leaves);
+        tree.position.set(x, 0, z);
+        scene.add(tree);
+
+        // Stone
+        if (i % 2 === 0) {
+          const stone = new THREE.Mesh(
+            new THREE.DodecahedronGeometry(0.8 + Math.random() * 0.8),
+            new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.9 })
+          );
+          stone.position.set(x + 3, 0.5, z + 2);
+          scene.add(stone);
+        }
+      }
     }
+    populateWorld();
 
-    for (let i = 0; i < 35; i++) {
-      createTree((Math.random() - 0.5) * 200, (Math.random() - 0.5) * 200);
+    // Birds
+    const birds = [];
+    for (let i = 0; i < 8; i++) {
+      const bird = new THREE.Mesh(
+        new THREE.ConeGeometry(0.3, 0.8, 3),
+        new THREE.MeshBasicMaterial({ color: 0x1e293b })
+      );
+      bird.rotation.x = Math.PI / 2;
+      bird.position.set((Math.random() - 0.5) * 200, 18 + Math.random() * 10, (Math.random() - 0.5) * 200);
+      scene.add(bird);
+      birds.push(bird);
     }
 
     // --- CHARACTER SETUP ---
     const characterGroup = new THREE.Group();
     scene.add(characterGroup);
 
-    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x2563eb });
+    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8 });
     const skinMat = new THREE.MeshStandardMaterial({ color: 0xffdbac });
     const pantMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
 
-    // Torso
     const torso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), bodyMat);
     torso.position.y = 1.4;
     characterGroup.add(torso);
 
-    // Head
     const head = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), skinMat);
     head.position.y = 2.25;
     characterGroup.add(head);
 
-    // Legs
     const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.0, 0.3), pantMat);
     leftLeg.position.set(-0.25, 0.5, 0);
     characterGroup.add(leftLeg);
@@ -331,41 +371,38 @@
     rightLeg.position.set(0.25, 0.5, 0);
     characterGroup.add(rightLeg);
 
-    // 3D Gun Attachment
-    const gun = new THREE.Mesh(
-      new THREE.BoxGeometry(0.15, 0.15, 0.7),
-      new THREE.MeshStandardMaterial({ color: 0x000000 })
-    );
-    gun.position.set(0.4, 1.3, -0.3);
-    characterGroup.add(gun);
+    // Realistic Gun Mesh & Muzzle Flash
+    const gunGroup = new THREE.Group();
+    const gunBody = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.85), new THREE.MeshStandardMaterial({ color: 0x111827 }));
+    gunBody.position.set(0.38, 1.35, -0.4);
+    gunGroup.add(gunBody);
 
-    // Character State
+    const muzzleFlash = new THREE.Mesh(
+      new THREE.SphereGeometry(0.2, 8, 8),
+      new THREE.MeshBasicMaterial({ color: 0xfde047, transparent: true, opacity: 0 })
+    );
+    muzzleFlash.position.set(0.38, 1.35, -0.9);
+    gunGroup.add(muzzleFlash);
+    characterGroup.add(gunGroup);
+
     const playerState = {
-      y: 0,
-      velocityY: 0,
-      isGrounded: true,
-      mode: 'stand',
-      targetScaleY: 1,
-      targetRotationX: 0,
-      hp: 100,
-      maxHp: 100
+      y: 0, velocityY: 0, isGrounded: true,
+      mode: 'stand', targetScaleY: 1, targetRotationX: 0,
+      hp: 100
     };
 
-    // --- CAMERA ROTATION (SWIPE) LOGIC ---
-    let cameraAngleYaw = 0;   // Horizontal rotation
-    let cameraAnglePitch = 0.3; // Vertical rotation
+    // --- CAMERA (SWIPE CONTROLS & SHOULDER AIM) ---
+    let cameraAngleYaw = 0;
+    let cameraAnglePitch = 0.2;
     let isSwiping = false;
-    let lastTouchX = 0;
-    let lastTouchY = 0;
+    let lastTouchX = 0, lastTouchY = 0;
 
     window.addEventListener('touchstart', (e) => {
       for (let i = 0; i < e.touches.length; i++) {
-        const touch = e.touches[i];
-        // Only swipe camera if touch is on right half of screen
-        if (touch.clientX > window.innerWidth / 2) {
+        if (e.touches[i].clientX > window.innerWidth / 2) {
           isSwiping = true;
-          lastTouchX = touch.clientX;
-          lastTouchY = touch.clientY;
+          lastTouchX = e.touches[i].clientX;
+          lastTouchY = e.touches[i].clientY;
         }
       }
     });
@@ -373,29 +410,24 @@
     window.addEventListener('touchmove', (e) => {
       if (!isSwiping) return;
       for (let i = 0; i < e.touches.length; i++) {
-        const touch = e.touches[i];
-        if (touch.clientX > window.innerWidth / 3) {
-          const deltaX = touch.clientX - lastTouchX;
-          const deltaY = touch.clientY - lastTouchY;
-
-          cameraAngleYaw -= deltaX * 0.005;
-          cameraAnglePitch += deltaY * 0.003;
-          cameraAnglePitch = Math.max(0.05, Math.min(Math.PI / 2.5, cameraAnglePitch)); // Clamp vertical angle
-
-          lastTouchX = touch.clientX;
-          lastTouchY = touch.clientY;
+        if (e.touches[i].clientX > window.innerWidth / 3) {
+          const dx = e.touches[i].clientX - lastTouchX;
+          const dy = e.touches[i].clientY - lastTouchY;
+          cameraAngleYaw -= dx * 0.005;
+          cameraAnglePitch += dy * 0.003;
+          cameraAnglePitch = Math.max(-0.1, Math.min(Math.PI / 2.5, cameraAnglePitch));
+          lastTouchX = e.touches[i].clientX;
+          lastTouchY = e.touches[i].clientY;
         }
       }
     });
-
-    window.addEventListener('touchend', () => { isSwiping = false; });
+    window.addEventListener('touchend', () => isSwiping = false);
 
     // --- JOYSTICK LOGIC ---
     let joystickInput = { x: 0, y: 0 };
     const joystickContainer = document.getElementById('joystick-container');
     const joystickKnob = document.getElementById('joystick-knob');
-    let joystickActive = false;
-    let joystickOrigin = { x: 0, y: 0 };
+    let joystickActive = false, joystickOrigin = { x: 0, y: 0 };
 
     function handleJoystickStart(e) {
       const touch = e.touches ? e.touches[0] : e;
@@ -410,15 +442,12 @@
       const touch = e.touches ? e.touches[0] : e;
       const dx = touch.clientX - joystickOrigin.x;
       const dy = touch.clientY - joystickOrigin.y;
-      const dist = Math.min(Math.hypot(dx, dy), 45);
+      const dist = Math.min(Math.hypot(dx, dy), 42);
       const angle = Math.atan2(dy, dx);
 
-      const knobX = Math.cos(angle) * dist;
-      const knobY = Math.sin(angle) * dist;
-
-      joystickKnob.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`;
-      joystickInput.x = knobX / 45;
-      joystickInput.y = knobY / 45;
+      joystickKnob.style.transform = `translate(calc(-50% + ${Math.cos(angle) * dist}px), calc(-50% + ${Math.sin(angle) * dist}px))`;
+      joystickInput.x = (Math.cos(angle) * dist) / 42;
+      joystickInput.y = (Math.sin(angle) * dist) / 42;
     }
 
     function handleJoystickEnd() {
@@ -430,32 +459,31 @@
     joystickContainer.addEventListener('touchstart', handleJoystickStart);
     window.addEventListener('touchmove', handleJoystickMove);
     window.addEventListener('touchend', handleJoystickEnd);
-
-    // Mouse Fallbacks for Testing
     joystickContainer.addEventListener('mousedown', handleJoystickStart);
     window.addEventListener('mousemove', (e) => { if (joystickActive) handleJoystickMove(e); });
     window.addEventListener('mouseup', handleJoystickEnd);
 
-    // --- ZOMBIES SYSTEM ---
-    const zombies = [];
+    // --- 50 ZOMBIES & ROUND SYSTEM ---
+    const TOTAL_ZOMBIES_ROUND = 50;
+    let zombiesRemaining = TOTAL_ZOMBIES_ROUND;
     let kills = 0;
+    const zombies = [];
 
     function spawnZombie() {
       const zombieGroup = new THREE.Group();
-      const zMat = new THREE.MeshStandardMaterial({ color: 0x16a34a }); // Green Zombie skin
-      const zClothMat = new THREE.MeshStandardMaterial({ color: 0x991b1b });
+      const zSkin = new THREE.MeshStandardMaterial({ color: 0x15803d });
+      const zCloth = new THREE.MeshStandardMaterial({ color: 0x7f1d1d });
 
-      const zTorso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), zClothMat);
+      const zTorso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), zCloth);
       zTorso.position.y = 1.2;
       zombieGroup.add(zTorso);
 
-      const zHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 12, 12), zMat);
+      const zHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 12, 12), zSkin);
       zHead.position.y = 2.0;
       zombieGroup.add(zHead);
 
-      // Random Spawn Around Player
       const angle = Math.random() * Math.PI * 2;
-      const dist = 35 + Math.random() * 25;
+      const dist = 30 + Math.random() * 30;
       zombieGroup.position.set(
         characterGroup.position.x + Math.cos(angle) * dist,
         0,
@@ -466,32 +494,40 @@
       zombies.push(zombieGroup);
     }
 
-    for (let i = 0; i < 8; i++) spawnZombie();
+    // Keep active batch on screen
+    for (let i = 0; i < 10; i++) spawnZombie();
 
-    // --- BULLETS & SHOOTING SYSTEM ---
+    // --- SHOOTING & BULLET SYSTEM ---
     const bullets = [];
 
     function shoot() {
-      const bulletGeo = new THREE.SphereGeometry(0.12, 8, 8);
-      const bulletMat = new THREE.MeshBasicMaterial({ color: 0xfde047 });
-      const bullet = new THREE.Mesh(bulletGeo, bulletMat);
+      playGunSound();
+
+      // Flash Effect
+      muzzleFlash.material.opacity = 1;
+      setTimeout(() => muzzleFlash.material.opacity = 0, 50);
+
+      const bullet = new THREE.Mesh(
+        new THREE.SphereGeometry(0.14, 8, 8),
+        new THREE.MeshBasicMaterial({ color: 0xfacc15 })
+      );
 
       bullet.position.set(
-        characterGroup.position.x,
-        characterGroup.position.y + 1.4,
+        characterGroup.position.x + 0.35,
+        characterGroup.position.y + 1.35,
         characterGroup.position.z
       );
 
-      // Shoot in direction of Camera Aim (+ Crosshair)
-      const aimDir = new THREE.Vector3();
-      camera.getWorldDirection(aimDir);
+      // Shoot towards Crosshair Aim
+      const dir = new THREE.Vector3();
+      camera.getWorldDirection(dir);
+      bullet.velocity = dir.multiplyScalar(1.2);
 
-      bullet.velocity = aimDir.multiplyScalar(0.9);
       scene.add(bullet);
       bullets.push(bullet);
     }
 
-    // --- BUTTON CONTROLS ---
+    // Button Events
     document.getElementById('btn-fire').addEventListener('touchstart', (e) => { e.preventDefault(); shoot(); });
     document.getElementById('btn-jump').addEventListener('touchstart', (e) => {
       e.preventDefault();
@@ -510,20 +546,17 @@
     });
 
     // --- GAME LOOP ---
-    const clock = new THREE.Clock();
-
     function animate() {
       requestAnimationFrame(animate);
 
-      let moveSpeed = 0.12;
-      if (playerState.mode === 'sit') { playerState.targetScaleY = 0.55; moveSpeed = 0.05; playerState.targetRotationX = 0; }
-      else if (playerState.mode === 'lie') { playerState.targetScaleY = 0.25; moveSpeed = 0.03; playerState.targetRotationX = -Math.PI / 2.3; }
-      else { playerState.targetScaleY = 1.0; playerState.targetRotationX = 0; }
+      let moveSpeed = 0.13;
+      if (playerState.mode === 'sit') { playerState.targetScaleY = 0.55; moveSpeed = 0.05; }
+      else if (playerState.mode === 'lie') { playerState.targetScaleY = 0.25; moveSpeed = 0.03; }
+      else { playerState.targetScaleY = 1.0; }
 
       characterGroup.scale.y += (playerState.targetScaleY - characterGroup.scale.y) * 0.15;
-      characterGroup.rotation.x += (playerState.targetRotationX - characterGroup.rotation.x) * 0.15;
 
-      // Gravity & Jumping
+      // Gravity
       if (!playerState.isGrounded) {
         playerState.y += playerState.velocityY;
         playerState.velocityY -= 0.01;
@@ -531,7 +564,7 @@
       }
       characterGroup.position.y = playerState.y;
 
-      // Joystick Relative to Camera Rotation
+      // Character Movement aligned with Camera Direction
       if (Math.abs(joystickInput.x) > 0.1 || Math.abs(joystickInput.y) > 0.1) {
         const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
         const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
@@ -544,8 +577,10 @@
         characterGroup.position.x += moveDir.x * moveSpeed;
         characterGroup.position.z += moveDir.z * moveSpeed;
 
-        // Character faces movement direction
         characterGroup.rotation.y = Math.atan2(moveDir.x, moveDir.z);
+      } else {
+        // Face camera direction when aiming
+        characterGroup.rotation.y = cameraAngleYaw;
       }
 
       // Update Bullets
@@ -553,56 +588,74 @@
         const b = bullets[i];
         b.position.add(b.velocity);
 
-        // Bullet vs Zombie Collision
         for (let j = zombies.length - 1; j >= 0; j--) {
           const z = zombies[j];
-          if (b.position.distanceTo(z.position) < 1.4) {
+          if (b.position.distanceTo(z.position) < 1.5) {
             scene.remove(z);
             zombies.splice(j, 1);
             scene.remove(b);
             bullets.splice(i, 1);
 
             kills++;
+            zombiesRemaining--;
             document.getElementById('score').innerText = kills;
-            spawnZombie();
+            document.getElementById('z-left').innerText = zombiesRemaining;
+
+            if (zombiesRemaining > 0) {
+              spawnZombie();
+            } else {
+              alert('🏆 Victory! Aapne saare 50 Zombies ko maar giraya!');
+              location.reload();
+            }
             break;
           }
         }
 
-        if (b && b.position.distanceTo(characterGroup.position) > 90) {
+        if (b && b.position.distanceTo(characterGroup.position) > 100) {
           scene.remove(b);
           bullets.splice(i, 1);
         }
       }
 
-      // Update Zombies & Attack Player Logic
+      // Fast Aggressive Zombies
       zombies.forEach(z => {
         const dir = new THREE.Vector3().subVectors(characterGroup.position, z.position).normalize();
-        z.position.add(dir.multiplyScalar(0.035));
+        z.position.add(dir.multiplyScalar(0.065)); // Increased Fast Speed
         z.lookAt(characterGroup.position.x, z.position.y, characterGroup.position.z);
 
-        // Zombie attack player if close
-        if (z.position.distanceTo(characterGroup.position) < 1.2) {
-          playerState.hp = Math.max(0, playerState.hp - 0.25);
+        // Attack Player
+        if (z.position.distanceTo(characterGroup.position) < 1.3) {
+          playerState.hp = Math.max(0, playerState.hp - 0.4);
           document.getElementById('hp-bar').style.width = playerState.hp + '%';
           document.getElementById('hp-text').innerText = `HP: ${Math.ceil(playerState.hp)} / 100`;
 
           if (playerState.hp <= 0) {
-            alert('Game Over! Restarting game...');
-            playerState.hp = 100;
-            kills = 0;
-            document.getElementById('score').innerText = 0;
-            characterGroup.position.set(0, 0, 0);
+            alert('☠️ Game Over! Zombies ne aap par kabza kar liya.');
+            location.reload();
           }
         }
       });
 
-      // Camera Orbit Around Player
-      const camDist = 8;
-      camera.position.x = characterGroup.position.x + camDist * Math.sin(cameraAngleYaw) * Math.cos(cameraAnglePitch);
-      camera.position.y = characterGroup.position.y + camDist * Math.sin(cameraAnglePitch) + 1.5;
-      camera.position.z = characterGroup.position.z + camDist * Math.cos(cameraAngleYaw) * Math.cos(cameraAnglePitch);
-      camera.lookAt(characterGroup.position.x, characterGroup.position.y + 1.2, characterGroup.position.z);
+      // Animate Flying Birds
+      birds.forEach(b => {
+        b.position.x += 0.15;
+        if (b.position.x > 150) b.position.x = -150;
+      });
+
+      // Over-the-Shoulder PUBG Camera Offset
+      const camDist = 5.5;
+      const camHeight = 2.2;
+      const shoulderOffset = 0.95; // Offsets player slightly left of screen center
+
+      const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
+      const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
+
+      camera.position.x = characterGroup.position.x + right.x * shoulderOffset - forward.x * camDist;
+      camera.position.y = characterGroup.position.y + camHeight + Math.sin(cameraAnglePitch) * 2;
+      camera.position.z = characterGroup.position.z + right.z * shoulderOffset - forward.z * camDist;
+
+      const targetLook = characterGroup.position.clone().add(forward.clone().multiplyScalar(20)).add(right.clone().multiplyScalar(shoulderOffset));
+      camera.lookAt(targetLook);
 
       renderer.render(scene, camera);
     }
