@@ -3,468 +3,178 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Stardust Warrior: Ultimate Survival RPG</title>
+  <title>Stardust Warrior</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
-    html, body { width: 100vw; height: 100vh; overflow: hidden; background: #000; font-family: 'Segoe UI', Roboto, sans-serif; }
-    #canvas-container { width: 100%; height: 100%; position: absolute; top:0; left:0; }
-    
-    /* Crosshair */
-    #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; pointer-events: none; z-index: 20; }
-    #crosshair::before, #crosshair::after { content: ''; position: absolute; background: rgba(255, 255, 255, 0.9); box-shadow: 0 0 4px #000; }
-    #crosshair::before { top: 6px; left: 0; width: 14px; height: 2px; }
-    #crosshair::after { top: 0; left: 6px; width: 2px; height: 14px; }
-
-    /* SURVIVAL VITALS HUD (Bottom-Left) */
-    #vitals-panel { position: absolute; bottom: 20px; left: 20px; width: 220px; display: flex; flex-direction: column; gap: 5px; z-index: 30; pointer-events: none; }
-    .vital-box { width: 100%; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255,255,255,0.25); border-radius: 6px; padding: 4px 8px; color: #f8fafc; font-size: 10px; font-weight: bold; backdrop-filter: blur(4px); }
-    .vital-bar { height: 6px; width: 100%; background: #334155; border-radius: 3px; overflow: hidden; margin-top: 2px; }
-    .vital-fill { height: 100%; width: 100%; transition: width 0.2s linear; }
-    #fill-hp { background: #ef4444; }
-    #fill-hunger { background: #f59e0b; }
-    #fill-thirst { background: #06b6d4; }
-    #fill-temp { background: #a855f7; }
-
-    /* TOP RIGHT CONTROLS & RADAR MAP */
-    #top-right-hud { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; align-items: flex-start; z-index: 30; }
-    .hud-btn { background: rgba(15, 23, 42, 0.85); color: #38bdf8; border: 1px solid #38bdf8; border-radius: 8px; padding: 8px 12px; font-size: 11px; font-weight: bold; cursor: pointer; backdrop-filter: blur(4px); }
-    #minimap-card { width: 100px; height: 100px; border-radius: 50%; border: 2px solid #38bdf8; background: rgba(15, 23, 42, 0.9); overflow: hidden; cursor: pointer; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #0b0e14; font-family: 'Segoe UI', system-ui, sans-serif; }
+    #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+    #crosshair { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 20px; height: 20px; pointer-events: none; z-index: 20; }
+    #crosshair::before, #crosshair::after { content: ''; position: absolute; background: rgba(255,255,255,0.85); box-shadow: 0 0 4px #000; }
+    #crosshair::before { top: 8px; left: 0; width: 20px; height: 2px; }
+    #crosshair::after { top: 0; left: 8px; width: 2px; height: 20px; }
+    #ui-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+    #joystick-container { position: absolute; bottom: 35px; left: 40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.25); border-radius: 50%; backdrop-filter: blur(6px); pointer-events: auto; touch-action: none; }
+    #joystick-knob { position: absolute; top: 50%; left: 50%; width: 46px; height: 46px; background: rgba(255,255,255,0.7); border-radius: 50%; transform: translate(-50%,-50%); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+    .action-btn { position: absolute; background: rgba(15,23,42,0.65); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 700; font-size: 11px; backdrop-filter: blur(4px); pointer-events: auto; touch-action: manipulation; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+    .action-btn:active { background: rgba(34,197,94,0.85); transform: scale(0.92); }
+    #btn-fire { bottom: 95px; right: 125px; width: 70px; height: 70px; background: rgba(220,38,38,0.85); border-color: #fca5a5; font-size: 13px; }
+    #btn-jump { bottom: 155px; right: 40px; width: 54px; height: 54px; }
+    #btn-sit { bottom: 30px; right: 40px; width: 54px; height: 54px; }
+    #btn-lie { bottom: 30px; right: 125px; width: 54px; height: 54px; }
+    #btn-reload { bottom: 175px; right: 125px; width: 48px; height: 48px; background: rgba(234,179,8,0.7); }
+    #btn-vehicle { display: none; bottom: 110px; right: 220px; width: 64px; height: 64px; border-radius: 12px; background: rgba(37,99,235,0.85); border: 2px solid #93c5fd; color: #fff; font-size: 10px; font-weight: bold; text-align: center; line-height: 1.2; pointer-events: auto; }
+    #hud-panel { display: none; position: absolute; top: 15px; left: 20px; background: rgba(15,23,42,0.75); color: #f8fafc; padding: 12px 16px; border-radius: 10px; font-size: 13px; border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(6px); display: flex; flex-direction: column; gap: 6px; min-width: 210px; z-index: 20; }
+    .hud-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .hud-icon-text { display: flex; align-items: center; gap: 6px; }
+    #vitals-container { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 4px; width: 240px; pointer-events: none; z-index: 15; }
+    .vital-bar-bg { width: 100%; height: 10px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.3); border-radius: 5px; overflow: hidden; }
+    .vital-bar-fill { height: 100%; width: 100%; transition: width 0.2s; }
+    #hp-bar { background: linear-gradient(90deg, #ef4444, #22c55e); }
+    #lobby-screen { position: absolute; top:0; left:0; width:100%; height:100%; z-index:50; display:flex; flex-direction:column; justify-content:space-between; padding:30px; pointer-events:auto; background: linear-gradient(180deg, rgba(15,23,42,0.6) 0%, rgba(0,0,0,0.2) 50%, rgba(15,23,42,0.8) 100%); }
+    .lobby-title { color: #38bdf8; font-size: 28px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 12px rgba(56,189,248,0.5); }
+    .btn-start { position: absolute; bottom: 40px; right: 40px; padding: 16px 42px; background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; font-size: 18px; font-weight: 800; border: 2px solid #86efac; border-radius: 12px; cursor: pointer; box-shadow: 0 6px 20px rgba(34,197,94,0.4); letter-spacing: 1px; }
+    .btn-start:active { transform: scale(0.95); }
+    #top-right-controls { display: none; position: absolute; top: 15px; right: 20px; display: flex; align-items: center; gap: 12px; z-index: 30; pointer-events: auto; }
+    .gun-select-box { background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 12px; color: #38bdf8; font-weight: bold; font-size: 13px; outline: none; cursor: pointer; backdrop-filter: blur(6px); }
+    .btn-icon-hud { width: 44px; height: 44px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(6px); }
+    #minimap-container { width: 100px; height: 100px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.6); overflow: hidden; background: rgba(15,23,42,0.85); box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; }
     #minimap-canvas { width: 100%; height: 100%; }
-
-    /* PROMPTS & MESSAGES */
-    #interaction-prompt { display: none; position: absolute; top: 62%; left: 50%; transform: translate(-50%, -50%); background: rgba(15, 23, 42, 0.9); color: #38bdf8; border: 2px solid #38bdf8; padding: 10px 20px; border-radius: 10px; font-size: 12px; font-weight: bold; z-index: 35; text-align: center; }
-
-    /* JOYSTICK CONTROLS */
-    #joystick-container { position: absolute; bottom: 30px; left: 30px; width: 120px; height: 120px; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; touch-action: none; z-index: 40; }
-    #joystick-knob { position: absolute; top: 50%; left: 50%; width: 44px; height: 44px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); }
-
-    /* ACTION BUTTONS */
-    .action-btn { position: absolute; background: rgba(15, 23, 42, 0.7); color: #fff; border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 11px; backdrop-filter: blur(4px); z-index: 40; touch-action: manipulation; }
-    .action-btn:active { transform: scale(0.92); background: rgba(34, 197, 94, 0.85); }
-    #btn-fire { bottom: 85px; right: 110px; width: 68px; height: 68px; background: rgba(220, 38, 38, 0.85); border-color: #fca5a5; font-size: 13px; }
-    #btn-vehicle { display: none; bottom: 100px; right: 200px; width: 60px; height: 60px; border-radius: 12px; background: #2563eb; border: 2px solid #93c5fd; text-align: center; font-size: 10px; line-height: 1.2; }
-
-    /* MODALS (INVENTORY & CRAFTING) */
-    .game-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; border-radius: 12px; padding: 16px; color: #fff; z-index: 100; backdrop-filter: blur(10px); width: 340px; }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.15); padding-bottom: 8px; margin-bottom: 12px; font-weight: bold; color: #38bdf8; font-size: 14px; }
-    .inventory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .inv-slot { aspect-ratio: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #94a3b8; }
-    .craft-item-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px; border-radius: 6px; margin-bottom: 6px; font-size: 12px; }
-    .btn-craft { background: #22c55e; border: none; color: #fff; padding: 4px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+    #inventory-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 340px; background: rgba(15,23,42,0.95); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 16px; z-index: 100; color: #fff; pointer-events: auto; backdrop-filter: blur(10px); }
+    #inventory-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 14px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
+    #inventory-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+    .inv-slot { width: 100%; aspect-ratio:1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #94a3b8; }
+    #fullmap-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 80vw; height: 80vh; background: rgba(15,23,42,0.95); border: 2px solid #38bdf8; border-radius: 12px; z-index: 200; pointer-events: auto; padding: 16px; flex-direction: column; backdrop-filter: blur(10px); }
+    #fullmap-header { display: flex; justify-content: space-between; color: #38bdf8; font-weight: bold; margin-bottom: 10px; }
+    #fullmap-canvas { width: 100%; height: calc(100% - 30px); background: #1e293b; border-radius: 8px; }
+    #portrait-warning { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background:#0f172a; color:#fff; z-index:9999; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px; }
+    @media screen and (orientation: portrait) { #portrait-warning { display: flex !important; } }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-
+  <div id="portrait-warning"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg><h2 style="margin-top:12px;">Rotate to Landscape</h2><p style="margin-top:6px;color:#94a3b8;font-size:13px;">Please orient your device horizontally.</p></div>
   <div id="canvas-container"></div>
   <div id="crosshair"></div>
-
-  <!-- SURVIVAL VITALS PANEL -->
-  <div id="vitals-panel">
-    <div class="vital-box">HEALTH <div class="vital-bar"><div id="fill-hp" class="vital-fill"></div></div></div>
-    <div class="vital-box">HUNGER <div class="vital-bar"><div id="fill-hunger" class="vital-fill"></div></div></div>
-    <div class="vital-box">THIRST <div class="vital-bar"><div id="fill-thirst" class="vital-fill"></div></div></div>
-    <div class="vital-box">BODY TEMP <div class="vital-bar"><div id="fill-temp" class="vital-fill"></div></div></div>
+  <div id="lobby-screen"><div class="lobby-header"><div class="lobby-title">STARDUST WARRIOR</div></div><button id="btn-start-game" class="btn-start">START GAME</button></div>
+  <div id="top-right-controls" style="display:none;">
+    <select id="gun-select" class="gun-select-box"><option value="AR Rifle">AR Rifle</option><option value="Pistol">Pistol</option><option value="Shotgun">Shotgun</option><option value="Sniper">Sniper</option></select>
+    <div id="btn-bag" class="btn-icon-hud"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>
+    <div id="minimap-container"><canvas id="minimap-canvas" width="100" height="100"></canvas></div>
   </div>
-
-  <!-- TOP RIGHT CONTROLS -->
-  <div id="top-right-hud">
-    <button id="btn-crafting-open" class="hud-btn">CRAFTING</button>
-    <button id="btn-inventory-open" class="hud-btn">BACKPACK</button>
-    <div id="minimap-card"><canvas id="minimap-canvas" width="100" height="100"></canvas></div>
+  <div id="fullmap-modal"><div id="fullmap-header"><span>TACTICAL MAP</span><button id="btn-close-fullmap" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;">X</button></div><canvas id="fullmap-canvas"></canvas></div>
+  <div id="hud-panel">
+    <div class="hud-row"><div class="hud-icon-text"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg><span>Level <strong id="hud-level" style="color:#38bdf8;">1</strong></span></div><div class="hud-icon-text"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>XP <strong id="hud-xp" style="color:#a855f7;">0/100</strong></span></div></div>
+    <div class="hud-row"><div class="hud-icon-text"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span>Kills <strong id="hud-kills" style="color:#4ade80;">0</strong></span></div><div class="hud-icon-text"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M18 6L6 18M6 6l12 12"/></svg><span>Zombies <strong id="hud-zombies" style="color:#f87171;">50</strong></span></div></div>
+    <div class="hud-row"><div class="hud-icon-text"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg><span>Gun <strong id="hud-weapon" style="color:#fbbf24;">AR Rifle</strong> (<span id="hud-ammo">30/120</span>)</span></div></div>
   </div>
-
-  <div id="interaction-prompt">PROMPT MESSAGE</div>
-
-  <!-- TOUCH CONTROLS LAYER -->
-  <div id="joystick-container"><div id="joystick-knob"></div></div>
-  <div id="btn-fire" class="action-btn">FIRE</div>
-  <div id="btn-vehicle" class="action-btn">ENTER<br>VEHICLE</div>
-
-  <!-- INVENTORY BACKPACK MODAL -->
-  <div id="modal-inventory" class="game-modal">
-    <div class="modal-header">
-      <span>BACKPACK (WEIGHT: <span id="inv-weight">3.2</span>/30 kg)</span>
-      <button class="btn-close-modal" style="background:none; border:none; color:#fff; font-size:16px; cursor:pointer;">X</button>
-    </div>
-    <div class="inventory-grid">
-      <div class="inv-slot" style="color:#38bdf8;">Wood<br>x15</div>
-      <div class="inv-slot" style="color:#38bdf8;">Stone<br>x10</div>
-      <div class="inv-slot" style="color:#22c55e;">Bandage<br>x3</div>
-      <div class="inv-slot" style="color:#f59e0b;">Canned Food<br>x2</div>
-      <div class="inv-slot" style="color:#06b6d4;">Water Bottle<br>x2</div>
-      <div class="inv-slot" style="color:#a855f7;">Ammo<br>x60</div>
-      <div class="inv-slot">Empty</div>
-      <div class="inv-slot">Empty</div>
-    </div>
+  <div id="ui-layer">
+    <div id="joystick-container"><div id="joystick-knob"></div></div>
+    <div id="btn-fire" class="action-btn">FIRE</div>
+    <div id="btn-jump" class="action-btn">JUMP</div>
+    <div id="btn-sit" class="action-btn">SIT</div>
+    <div id="btn-lie" class="action-btn">LIE</div>
+    <div id="btn-reload" class="action-btn">RELOAD</div>
+    <div id="btn-vehicle" class="action-btn">ENTER<br>CAR</div>
+    <div id="vitals-container"><div class="vital-bar-bg"><div id="hp-bar" class="vital-bar-fill" style="width:100%"></div></div></div>
   </div>
-
-  <!-- CRAFTING MODAL -->
-  <div id="modal-crafting" class="game-modal">
-    <div class="modal-header">
-      <span>SURVIVAL CRAFTING</span>
-      <button class="btn-close-modal" style="background:none; border:none; color:#fff; font-size:16px; cursor:pointer;">X</button>
-    </div>
-    <div class="craft-item-row">
-      <span>Wooden Axe (10 Wood)</span>
-      <button class="btn-craft" onclick="craftItem('Axe')">CRAFT</button>
-    </div>
-    <div class="craft-item-row">
-      <span>Campfire (5 Wood, 5 Stone)</span>
-      <button class="btn-craft" onclick="craftItem('Campfire')">CRAFT</button>
-    </div>
-    <div class="craft-item-row">
-      <span>Medkit (2 Bandages)</span>
-      <button class="btn-craft" onclick="craftItem('Medkit')">CRAFT</button>
-    </div>
-  </div>
-
+  <div id="inventory-modal"><div id="inventory-header"><span>INVENTORY</span><button id="btn-close-inv" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;">X</button></div><div id="inventory-grid"><div class="inv-slot" style="color:#38bdf8;">Wood x12</div><div class="inv-slot">Stone x8</div><div class="inv-slot">Iron x4</div><div class="inv-slot">Food x3</div><div class="inv-slot">Water x2</div><div class="inv-slot">Medkit x1</div><div class="inv-slot">Ammo x120</div><div class="inv-slot">Empty</div></div></div>
   <script>
-    // --- THREE.JS ENGINE SETUP ---
-    const container = document.getElementById('canvas-container');
-    const scene = new THREE.Scene();
-    
-    // Day & Night Dynamic Sky Color Variables
-    const skyColorDay = new THREE.Color(0x38bdf8);
-    const skyColorNight = new THREE.Color(0x020617);
-    scene.background = skyColorDay.clone();
-    scene.fog = new THREE.FogExp2(0x38bdf8, 0.0035);
-
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;
-    container.appendChild(renderer.domElement);
-
-    // --- LIGHTS & DAY-NIGHT CYCLE ENGINE ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambientLight);
-    const sunLight = new THREE.DirectionalLight(0xfffbe1, 1.2);
-    sunLight.position.set(100, 150, 50);
-    sunLight.castShadow = true;
-    scene.add(sunLight);
-
-    let dayTime = 0; // 0 to 1 cycle
-    let isNight = false;
-
-    // --- PROCEDURAL MULTI-BIOME TERRAIN ENGINE ---
-    const worldSize = 700;
-    const terrainGeo = new THREE.PlaneGeometry(worldSize, worldSize, 120, 120);
-    terrainGeo.rotateX(-Math.PI / 2);
-
-    const pos = terrainGeo.attributes.position;
-    const colors = [];
-
-    for (let i = 0; i < pos.count; i++) {
-      const x = pos.getX(i);
-      const z = pos.getZ(i);
-
-      // Multi-Biome Heights (Valleys, Desert Dunes, High Mountains)
-      let h = Math.sin(x * 0.015) * Math.cos(z * 0.015) * 18 + Math.sin(x * 0.04) * 5;
-      pos.setY(i, h);
-
-      // Biome Color Palette Mapping
-      const color = new THREE.Color();
-      if (h > 15) {
-        color.setHex(0xf8fafc); // Snow Peak
-      } else if (x > 100) {
-        color.setHex(0xeab308); // Desert Biome
-      } else if (z < -100) {
-        color.setHex(0x14532d); // Deep Forest Biome
-      } else {
-        color.setHex(0x3f6212); // Valley Grass Biome
+    // --- AUDIO ---
+    const AudioEngine = { ctx: null, init(){ if(!this.ctx) this.ctx=new (window.AudioContext||window.webkitAudioContext)(); if(this.ctx.state==='suspended') this.ctx.resume(); }, playGunshot(){ this.init(); const now=this.ctx.currentTime; const osc=this.ctx.createOscillator(); const gain=this.ctx.createGain(); osc.type='sawtooth'; osc.frequency.setValueAtTime(400,now); osc.frequency.exponentialRampToValueAtTime(20,now+0.18); gain.gain.setValueAtTime(0.6,now); gain.gain.exponentialRampToValueAtTime(0.01,now+0.18); osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now+0.18); } };
+    // --- THREE.JS SETUP ---
+    const container=document.getElementById('canvas-container');
+    const scene=new THREE.Scene(); scene.background=new THREE.Color(0x38bdf8); scene.fog=new THREE.FogExp2(0x38bdf8,0.004);
+    const camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,1200);
+    const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
+    renderer.setSize(window.innerWidth,window.innerHeight); renderer.shadowMap.enabled=true; container.appendChild(renderer.domElement);
+    scene.add(new THREE.AmbientLight(0xffffff,0.65));
+    const sunLight=new THREE.DirectionalLight(0xfffbe1,1.2); sunLight.position.set(100,150,50); sunLight.castShadow=true; scene.add(sunLight);
+    // --- WORLD ---
+    const worldSize=800;
+    const ground=new THREE.Mesh(new THREE.PlaneGeometry(worldSize,worldSize),new THREE.MeshStandardMaterial({color:0x3f6212,roughness:0.9}));
+    ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; scene.add(ground);
+    // Terrain features: hills, mountains, cliffs, beach, jungle, snow, desert, swamp, canyon
+    for(let i=0;i<40;i++){ const h=10+Math.random()*30; const hill=new THREE.Mesh(new THREE.ConeGeometry(15+h*0.4,h,6),new THREE.MeshStandardMaterial({color:0x4a7c3f})); hill.position.set((Math.random()-0.5)*600, h/2-2, (Math.random()-0.5)*600); scene.add(hill); }
+    for(let i=0;i<20;i++){ const m=new THREE.Mesh(new THREE.ConeGeometry(20+Math.random()*30,40+Math.random()*50,5),new THREE.MeshStandardMaterial({color:0x475569})); m.position.set((Math.random()-0.5)*700, 20, (Math.random()-0.5)*700); scene.add(m); }
+    // Beach, snow, desert patches
+    const beachMat=new THREE.MeshStandardMaterial({color:0xf5e6ca}); for(let i=0;i<30;i++){ const b=new THREE.Mesh(new THREE.PlaneGeometry(5+Math.random()*10,5+Math.random()*10),beachMat); b.rotation.x=-Math.PI/2; b.position.set(250+Math.random()*100,0.1, -150+Math.random()*100); scene.add(b); }
+    const snowMat=new THREE.MeshStandardMaterial({color:0xffffff}); for(let i=0;i<30;i++){ const s=new THREE.Mesh(new THREE.PlaneGeometry(5+Math.random()*10,5+Math.random()*10),snowMat); s.rotation.x=-Math.PI/2; s.position.set(-300+Math.random()*100,0.1, -300+Math.random()*100); scene.add(s); }
+    const desertMat=new THREE.MeshStandardMaterial({color:0xe8c98a}); for(let i=0;i<30;i++){ const d=new THREE.Mesh(new THREE.PlaneGeometry(5+Math.random()*10,5+Math.random()*10),desertMat); d.rotation.x=-Math.PI/2; d.position.set(200+Math.random()*150,0.1, 200+Math.random()*150); scene.add(d); }
+    // Trees (Jungle)
+    for(let i=0;i<120;i++){ const tree=new THREE.Group(); const trunk=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.6,3+Math.random()*2),new THREE.MeshStandardMaterial({color:0x78350f})); trunk.position.y=1.8; tree.add(trunk); const leaves=new THREE.Mesh(new THREE.ConeGeometry(2+Math.random()*2,4+Math.random()*3,6),new THREE.MeshStandardMaterial({color:0x15803d})); leaves.position.y=4.5; tree.add(leaves); tree.position.set((Math.random()-0.5)*500,0,(Math.random()-0.5)*500); scene.add(tree); }
+    // Buildings: houses, hospital, school, factory, etc.
+    const buildMat=new THREE.MeshStandardMaterial({color:0xb8956e}); const roofMat=new THREE.MeshStandardMaterial({color:0x8b3a3a});
+    for(let i=0;i<25;i++){ const house=new THREE.Mesh(new THREE.BoxGeometry(2+Math.random()*2,1.8+Math.random()*1.5,2+Math.random()*2),buildMat); house.position.set(-150+Math.random()*300,0.9, -100+Math.random()*200); house.castShadow=true; house.receiveShadow=true; scene.add(house); const roof=new THREE.Mesh(new THREE.ConeGeometry(1.6+Math.random()*1.8,1.2,4),roofMat); roof.position.set(house.position.x,1.8+0.6,house.position.z); scene.add(roof); }
+    // Police station, hospital, factory
+    const police=new THREE.Mesh(new THREE.BoxGeometry(4,3,3),new THREE.MeshStandardMaterial({color:0x1e3a8a})); police.position.set(120,1.5,80); scene.add(police);
+    const hospital=new THREE.Mesh(new THREE.BoxGeometry(6,4,4),new THREE.MeshStandardMaterial({color:0xd4d4d4})); hospital.position.set(180,2,40); scene.add(hospital);
+    const factory=new THREE.Mesh(new THREE.BoxGeometry(8,5,6),new THREE.MeshStandardMaterial({color:0x4a5568})); factory.position.set(-80,2.5,-120); scene.add(factory);
+    // Roads and river
+    const roadMat=new THREE.MeshStandardMaterial({color:0x334155,roughness:0.6}); const mainRoad=new THREE.Mesh(new THREE.PlaneGeometry(16,worldSize),roadMat); mainRoad.rotation.x=-Math.PI/2; mainRoad.position.y=0.05; scene.add(mainRoad);
+    const riverMat=new THREE.MeshStandardMaterial({color:0x0284c7,roughness:0.1,metalness:0.8}); const river=new THREE.Mesh(new THREE.PlaneGeometry(25,worldSize),riverMat); river.rotation.x=-Math.PI/2; river.position.set(100,0.02,0); scene.add(river);
+    // --- CHARACTER ---
+    const characterGroup=new THREE.Group(); scene.add(characterGroup);
+    const torso=new THREE.Mesh(new THREE.BoxGeometry(0.8,1.2,0.5),new THREE.MeshStandardMaterial({color:0x0284c7})); torso.position.y=1.4; characterGroup.add(torso);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.35,16,16),new THREE.MeshStandardMaterial({color:0xffdbac})); head.position.y=2.25; characterGroup.add(head);
+    const gunGroup=new THREE.Group(); const gunBody=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.18,0.85),new THREE.MeshStandardMaterial({color:0x0f172a})); gunBody.position.set(0.38,1.35,-0.4); gunGroup.add(gunBody);
+    const muzzleFlash=new THREE.Mesh(new THREE.SphereGeometry(0.2,8,8),new THREE.MeshBasicMaterial({color:0xfde047,transparent:true,opacity:0})); muzzleFlash.position.set(0.38,1.35,-0.9); gunGroup.add(muzzleFlash); characterGroup.add(gunGroup);
+    // --- CAR ---
+    const carGroup=new THREE.Group(); const carBody=new THREE.Mesh(new THREE.BoxGeometry(2.2,1.2,4.2),new THREE.MeshStandardMaterial({color:0xd97706})); carBody.position.y=0.8; carGroup.add(carBody); const cabin=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.9,2.2),new THREE.MeshStandardMaterial({color:0x1e293b})); cabin.position.set(0,1.7,-0.2); carGroup.add(cabin); carGroup.position.set(10,0,10); scene.add(carGroup);
+    // --- PLAYER STATE ---
+    const player={ hp:100, level:1, xp:0, kills:0, ammo:30, maxAmmo:30, reserveAmmo:120, y:0, velocityY:0, grounded:true, mode:'stand', currentWeapon:'AR Rifle', speed:0.38 };
+    let isGameStarted=false, lobbyAngle=0, inVehicle=false, carSpeed=0;
+    const TOTAL_ZOMBIES=50; let zombiesRemaining=TOTAL_ZOMBIES; const zombies=[];
+    function spawnZombie(){ const g=new THREE.Group(); const zMat=new THREE.MeshStandardMaterial({color:0x16a34a}); const zTorso=new THREE.Mesh(new THREE.BoxGeometry(0.8,1.2,0.5),zMat); zTorso.position.y=1.2; g.add(zTorso); const zHead=new THREE.Mesh(new THREE.SphereGeometry(0.35,12,12),new THREE.MeshStandardMaterial({color:0x15803d})); zHead.position.y=2.0; g.add(zHead); const angle=Math.random()*Math.PI*2; const dist=40+Math.random()*40; g.position.set(characterGroup.position.x+Math.cos(angle)*dist,0,characterGroup.position.z+Math.sin(angle)*dist); g.userData={currentHp:100,speed:0.08}; scene.add(g); zombies.push(g); }
+    for(let i=0;i<15;i++) spawnZombie();
+    // --- LOBBY ---
+    document.getElementById('btn-start-game').addEventListener('click',()=>{ isGameStarted=true; document.getElementById('lobby-screen').style.display='none'; document.getElementById('ui-layer').style.display='block'; document.getElementById('hud-panel').style.display='flex'; document.getElementById('top-right-controls').style.display='flex'; document.getElementById('crosshair').style.display='block'; });
+    // --- GUN SELECT ---
+    document.getElementById('gun-select').addEventListener('change',(e)=>{ player.currentWeapon=e.target.value; if(player.currentWeapon==='Pistol'){player.maxAmmo=12; player.ammo=12;} else if(player.currentWeapon==='Shotgun'){player.maxAmmo=8; player.ammo=8;} else if(player.currentWeapon==='Sniper'){player.maxAmmo=5; player.ammo=5;} else {player.maxAmmo=30; player.ammo=30;} document.getElementById('hud-weapon').innerText=player.currentWeapon; document.getElementById('hud-ammo').innerText=`${player.ammo}/${player.reserveAmmo}`; });
+    // --- BAG & MAP ---
+    const invModal=document.getElementById('inventory-modal'); document.getElementById('btn-bag').addEventListener('click',()=>{ invModal.style.display=invModal.style.display==='block'?'none':'block'; }); document.getElementById('btn-close-inv').addEventListener('click',()=>invModal.style.display='none');
+    const fullMapModal=document.getElementById('fullmap-modal'); document.getElementById('minimap-container').addEventListener('click',()=>{ fullMapModal.style.display='flex'; renderFullMap(); }); document.getElementById('btn-close-fullmap').addEventListener('click',()=>fullMapModal.style.display='none');
+    // --- CAMERA TOUCH ---
+    let cameraAngleYaw=0, cameraAnglePitch=0.2, isSwiping=false, lastTX=0, lastTY=0;
+    window.addEventListener('touchstart',(e)=>{ if(!isGameStarted)return; for(let t of e.touches) if(t.clientX>window.innerWidth/2){ isSwiping=true; lastTX=t.clientX; lastTY=t.clientY; } });
+    window.addEventListener('touchmove',(e)=>{ if(!isSwiping||!isGameStarted)return; for(let t of e.touches) if(t.clientX>window.innerWidth/3){ const dx=t.clientX-lastTX; const dy=t.clientY-lastTY; cameraAngleYaw-=dx*0.005; cameraAnglePitch-=dy*0.003; cameraAnglePitch=Math.max(-0.4,Math.min(Math.PI/2.5,cameraAnglePitch)); lastTX=t.clientX; lastTY=t.clientY; } });
+    window.addEventListener('touchend',()=>isSwiping=false);
+    // --- JOYSTICK ---
+    let joystickInput={x:0,y:0}; const joyCont=document.getElementById('joystick-container'); const joyKnob=document.getElementById('joystick-knob'); let joyActive=false, joyOrigin={x:0,y:0};
+    function joyStart(e){ if(!isGameStarted)return; const t=e.touches?e.touches[0]:e; const rect=joyCont.getBoundingClientRect(); joyOrigin={x:rect.left+rect.width/2,y:rect.top+rect.height/2}; joyActive=true; joyMove(e); }
+    function joyMove(e){ if(!joyActive||!isGameStarted)return; const t=e.touches?e.touches[0]:e; const dx=t.clientX-joyOrigin.x; const dy=t.clientY-joyOrigin.y; const dist=Math.min(Math.hypot(dx,dy),40); const ang=Math.atan2(dy,dx); joyKnob.style.transform=`translate(calc(-50%+${Math.cos(ang)*dist}px), calc(-50%+${Math.sin(ang)*dist}px))`; joystickInput.x=Math.cos(ang)*dist/40; joystickInput.y=-Math.sin(ang)*dist/40; }
+    function joyEnd(){ joyActive=false; joyKnob.style.transform='translate(-50%,-50%)'; joystickInput={x:0,y:0}; }
+    joyCont.addEventListener('touchstart',joyStart); window.addEventListener('touchmove',joyMove); window.addEventListener('touchend',joyEnd);
+    // --- SHOOTING & VEHICLE ---
+    const bullets=[];
+    function shoot(){ if(!isGameStarted||player.ammo<=0||inVehicle)return; player.ammo--; document.getElementById('hud-ammo').innerText=`${player.ammo}/${player.reserveAmmo}`; AudioEngine.playGunshot(); muzzleFlash.material.opacity=1; setTimeout(()=>muzzleFlash.material.opacity=0,40); const b=new THREE.Mesh(new THREE.SphereGeometry(0.12,8,8),new THREE.MeshBasicMaterial({color:0xfacc15})); b.position.set(characterGroup.position.x+0.35,characterGroup.position.y+1.35,characterGroup.position.z); const dir=new THREE.Vector3(); camera.getWorldDirection(dir); b.velocity=dir.multiplyScalar(1.8); scene.add(b); bullets.push(b); }
+    document.getElementById('btn-fire').addEventListener('touchstart',(e)=>{e.preventDefault(); shoot();});
+    document.getElementById('btn-reload').addEventListener('touchstart',(e)=>{ e.preventDefault(); const needed=player.maxAmmo-player.ammo; if(needed>0&&player.reserveAmmo>0){ const transfer=Math.min(needed,player.reserveAmmo); player.reserveAmmo-=transfer; player.ammo+=transfer; document.getElementById('hud-ammo').innerText=`${player.ammo}/${player.reserveAmmo}`; } });
+    document.getElementById('btn-jump').addEventListener('touchstart',(e)=>{ e.preventDefault(); if(player.grounded&&player.mode!=='lie'){player.velocityY=0.22; player.grounded=false;}});
+    document.getElementById('btn-sit').addEventListener('touchstart',(e)=>{ e.preventDefault(); player.mode=player.mode==='sit'?'stand':'sit';});
+    document.getElementById('btn-lie').addEventListener('touchstart',(e)=>{ e.preventDefault(); player.mode=player.mode==='lie'?'stand':'lie';});
+    const btnVehicle=document.getElementById('btn-vehicle');
+    btnVehicle.addEventListener('touchstart',(e)=>{ e.preventDefault(); inVehicle=!inVehicle; if(inVehicle){ characterGroup.visible=false; btnVehicle.innerHTML="EXIT<br>CAR"; } else { characterGroup.visible=true; characterGroup.position.set(carGroup.position.x+2,0,carGroup.position.z); btnVehicle.innerHTML="ENTER<br>CAR"; } });
+    // --- MAPS ---
+    const miniCanvas=document.getElementById('minimap-canvas'); const miniCtx=miniCanvas.getContext('2d');
+    function drawRadarMap(ctx,w,h,scale){ ctx.clearRect(0,0,w,h); const cx=w/2, cy=h/2; ctx.fillStyle='#38bdf8'; ctx.beginPath(); ctx.arc(cx,cy,5,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#ef4444'; zombies.forEach(z=>{ const dx=(z.position.x-characterGroup.position.x)*scale; const dz=(z.position.z-characterGroup.position.z)*scale; if(Math.hypot(dx,dz)<w/2){ ctx.beginPath(); ctx.arc(cx+dx,cy+dz,3,0,Math.PI*2); ctx.fill(); } }); }
+    function renderFullMap(){ const canvas=document.getElementById('fullmap-canvas'); canvas.width=canvas.clientWidth; canvas.height=canvas.clientHeight; const ctx=canvas.getContext('2d'); drawRadarMap(ctx,canvas.width,canvas.height,0.8); }
+    // --- GAME LOOP ---
+    function animate(){ requestAnimationFrame(animate);
+      if(!isGameStarted){ lobbyAngle+=0.005; camera.position.x=characterGroup.position.x+Math.sin(lobbyAngle)*4.5; camera.position.z=characterGroup.position.z+Math.cos(lobbyAngle)*4.5; camera.position.y=2.0; camera.lookAt(characterGroup.position.x,1.4,characterGroup.position.z); } else {
+        const distToCar=characterGroup.position.distanceTo(carGroup.position); btnVehicle.style.display=(distToCar<4||inVehicle)?'flex':'none';
+        if(!inVehicle){ if(Math.abs(joystickInput.x)>0.1||Math.abs(joystickInput.y)>0.1){ const forward=new THREE.Vector3(0,0,-1).applyAxisAngle(new THREE.Vector3(0,1,0),cameraAngleYaw); const right=new THREE.Vector3(1,0,0).applyAxisAngle(new THREE.Vector3(0,1,0),cameraAngleYaw); const moveDir=new THREE.Vector3().addScaledVector(right,joystickInput.x).addScaledVector(forward,joystickInput.y).normalize(); characterGroup.position.x+=moveDir.x*player.speed; characterGroup.position.z+=moveDir.z*player.speed; characterGroup.rotation.y=Math.atan2(moveDir.x,moveDir.z); } } else { if(Math.abs(joystickInput.y)>0.1){ carSpeed=joystickInput.y*0.8; carGroup.translateZ(-carSpeed); } if(Math.abs(joystickInput.x)>0.1){ carGroup.rotation.y-=joystickInput.x*0.04; } characterGroup.position.copy(carGroup.position); for(let j=zombies.length-1;j>=0;j--){ if(carGroup.position.distanceTo(zombies[j].position)<2.2){ scene.remove(zombies[j]); zombies.splice(j,1); player.kills++; zombiesRemaining--; player.xp+=20; document.getElementById('hud-kills').innerText=player.kills; document.getElementById('hud-zombies').innerText=zombiesRemaining; document.getElementById('hud-xp').innerText=`${player.xp}/100`; if(zombiesRemaining>0) spawnZombie(); } } }
+        // Bullets
+        for(let i=bullets.length-1;i>=0;i--){ const b=bullets[i]; b.position.add(b.velocity); for(let j=zombies.length-1;j>=0;j--){ const z=zombies[j]; if(b.position.distanceTo(z.position)<1.6){ z.userData.currentHp-=50; scene.remove(b); bullets.splice(i,1); if(z.userData.currentHp<=0){ scene.remove(z); zombies.splice(j,1); player.kills++; zombiesRemaining--; player.xp+=20; document.getElementById('hud-kills').innerText=player.kills; document.getElementById('hud-zombies').innerText=zombiesRemaining; document.getElementById('hud-xp').innerText=`${player.xp}/100`; if(zombiesRemaining>0) spawnZombie(); } break; } } if(b&&b.position.distanceTo(characterGroup.position)>120){ scene.remove(b); bullets.splice(i,1); } }
+        // Zombie AI
+        const targetPos=inVehicle?carGroup.position:characterGroup.position;
+        zombies.forEach(z=>{ const dir=new THREE.Vector3().subVectors(targetPos,z.position).normalize(); z.position.add(dir.multiplyScalar(z.userData.speed)); z.lookAt(targetPos.x,z.position.y,targetPos.z); if(!inVehicle&&z.position.distanceTo(characterGroup.position)<1.4){ player.hp=Math.max(0,player.hp-0.35); document.getElementById('hp-bar').style.width=player.hp+'%'; if(player.hp<=0){ alert('Game Over!'); location.reload(); } } });
+        // Camera
+        const activeObj=inVehicle?carGroup:characterGroup; const camDist=inVehicle?8.5:5.5; const camHeight=inVehicle?3.5:2.2; const forward=new THREE.Vector3(0,0,-1).applyAxisAngle(new THREE.Vector3(0,1,0),cameraAngleYaw); const right=new THREE.Vector3(1,0,0).applyAxisAngle(new THREE.Vector3(0,1,0),cameraAngleYaw); camera.position.x=activeObj.position.x-forward.x*camDist; camera.position.y=activeObj.position.y+camHeight+Math.sin(cameraAnglePitch)*2; camera.position.z=activeObj.position.z-forward.z*camDist; camera.lookAt(activeObj.position.x,activeObj.position.y+1.2,activeObj.position.z);
+        drawRadarMap(miniCtx,100,100,0.9);
       }
-      colors.push(color.r, color.g, color.b);
+      renderer.render(scene,camera);
     }
-    terrainGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    terrainGeo.computeVertexNormals();
-
-    const terrainMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9 });
-    const terrain = new THREE.Mesh(terrainGeo, terrainMat);
-    terrain.receiveShadow = true;
-    scene.add(terrain);
-
-    function getTerrainHeight(x, z) {
-      return Math.sin(x * 0.015) * Math.cos(z * 0.015) * 18 + Math.sin(x * 0.04) * 5;
-    }
-
-    // --- PLAYER & CHARACTER MODEL ---
-    const playerGroup = new THREE.Group();
-    scene.add(playerGroup);
-
-    const torso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), new THREE.MeshStandardMaterial({ color: 0x0284c7 }));
-    torso.position.y = 1.2;
-    playerGroup.add(torso);
-
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.35, 12, 12), new THREE.MeshStandardMaterial({ color: 0xffdbac }));
-    head.position.y = 2.1;
-    playerGroup.add(head);
-
-    const gunMesh = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.15, 0.8), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
-    gunMesh.position.set(0.35, 1.2, -0.4);
-    playerGroup.add(gunMesh);
-
-    const vitals = { hp: 100, hunger: 100, thirst: 100, temp: 100 };
-    const playerSpeed = 0.32;
-
-    // --- DRIVABLE VEHICLE SYSTEM (SUV) ---
-    const vehicleGroup = new THREE.Group();
-    const vBody = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.3, 4.5), new THREE.MeshStandardMaterial({ color: 0xd97706 }));
-    vBody.position.y = 0.9;
-    vehicleGroup.add(vBody);
-    const vCabin = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.0, 2.4), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
-    vCabin.position.set(0, 1.8, -0.2);
-    vehicleGroup.add(vCabin);
-
-    vehicleGroup.position.set(15, getTerrainHeight(15, 15), 15);
-    scene.add(vehicleGroup);
-
-    let inVehicle = false;
-
-    // --- BUILDINGS & LOOT CONTAINERS ---
-    const loots = [];
-    function createBuilding(x, z, type) {
-      const bGroup = new THREE.Group();
-      const y = getTerrainHeight(x, z);
-
-      const house = new THREE.Mesh(
-        new THREE.BoxGeometry(10, 5, 10),
-        new THREE.MeshStandardMaterial({ color: type === 'Military' ? 0x334155 : 0x94a3b8 })
-      );
-      house.position.y = 2.5;
-      bGroup.add(house);
-
-      bGroup.position.set(x, y, z);
-      scene.add(bGroup);
-
-      // Spawn Loot inside
-      const lootMesh = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.6), new THREE.MeshStandardMaterial({ color: 0xf59e0b }));
-      lootMesh.position.set(x, y + 0.5, z);
-      scene.add(lootMesh);
-      loots.push(lootMesh);
-    }
-
-    createBuilding(30, -30, 'House');
-    createBuilding(-60, 40, 'Military');
-
-    // --- ZOMBIE AI & BOSS ZOMBIE SYSTEM ---
-    const zombies = [];
-
-    function spawnZombie(isBoss = false) {
-      const zGroup = new THREE.Group();
-      const scale = isBoss ? 2.2 : 1.0;
-      const zMat = new THREE.MeshStandardMaterial({ color: isBoss ? 0xdc2626 : 0x16a34a });
-
-      const zTorso = new THREE.Mesh(new THREE.BoxGeometry(0.8 * scale, 1.2 * scale, 0.5 * scale), zMat);
-      zTorso.position.y = 1.2 * scale;
-      zGroup.add(zTorso);
-
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 50 + Math.random() * 50;
-      const x = playerGroup.position.x + Math.cos(angle) * dist;
-      const z = playerGroup.position.z + Math.sin(angle) * dist;
-
-      zGroup.position.set(x, getTerrainHeight(x, z), z);
-      zGroup.userData = { isBoss, hp: isBoss ? 400 : 100, speed: isBoss ? 0.12 : 0.08 };
-
-      scene.add(zGroup);
-      zombies.push(zGroup);
-    }
-
-    for (let i = 0; i < 12; i++) spawnZombie(false);
-    spawnZombie(true); // Spawn Giant Boss Zombie
-
-    // --- CONTROLS & TOUCH ENGINE ---
-    let cameraYaw = 0, cameraPitch = 0.2;
-    let joystickInput = { x: 0, y: 0 };
-
-    const jContainer = document.getElementById('joystick-container');
-    const jKnob = document.getElementById('joystick-knob');
-    let jActive = false, jOrigin = { x: 0, y: 0 };
-
-    jContainer.addEventListener('touchstart', (e) => {
-      jActive = true;
-      const rect = jContainer.getBoundingClientRect();
-      jOrigin = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-    });
-
-    window.addEventListener('touchmove', (e) => {
-      if (!jActive) return;
-      const touch = e.touches[0];
-      const dx = touch.clientX - jOrigin.x;
-      const dy = touch.clientY - jOrigin.y;
-      const dist = Math.min(Math.hypot(dx, dy), 40);
-      const angle = Math.atan2(dy, dx);
-
-      jKnob.style.transform = `translate(calc(-50% + ${Math.cos(angle) * dist}px), calc(-50% + ${Math.sin(angle) * dist}px))`;
-      joystickInput.x = (Math.cos(angle) * dist) / 40;
-      joystickInput.y = -(Math.sin(angle) * dist) / 40; // Forward Axis Fixed
-    });
-
-    window.addEventListener('touchend', () => {
-      jActive = false;
-      jKnob.style.transform = 'translate(-50%, -50%)';
-      joystickInput = { x: 0, y: 0 };
-    });
-
-    // Touch Camera rotation
-    let lastT = { x: 0, y: 0 };
-    window.addEventListener('touchstart', (e) => {
-      if (e.touches[0].clientX > window.innerWidth / 2) {
-        lastT.x = e.touches[0].clientX;
-        lastT.y = e.touches[0].clientY;
-      }
-    });
-
-    window.addEventListener('touchmove', (e) => {
-      if (e.touches[0].clientX > window.innerWidth / 2) {
-        const dx = e.touches[0].clientX - lastT.x;
-        const dy = e.touches[0].clientY - lastT.y;
-        cameraYaw -= dx * 0.005;
-        cameraPitch -= dy * 0.003; // Inversion Fixed
-        cameraPitch = Math.max(-0.2, Math.min(Math.PI / 3, cameraPitch));
-        lastT.x = e.touches[0].clientX;
-        lastT.y = e.touches[0].clientY;
-      }
-    });
-
-    // Modal Control Triggers
-    const modalInv = document.getElementById('modal-inventory');
-    const modalCraft = document.getElementById('modal-crafting');
-
-    document.getElementById('btn-inventory-open').onclick = () => modalInv.style.display = 'block';
-    document.getElementById('btn-crafting-open').onclick = () => modalCraft.style.display = 'block';
-    document.querySelectorAll('.btn-close-modal').forEach(b => b.onclick = () => {
-      modalInv.style.display = 'none';
-      modalCraft.style.display = 'none';
-    });
-
-    function craftItem(name) {
-      alert(`Crafted ${name} successfully!`);
-      modalCraft.style.display = 'none';
-    }
-
-    // Vehicle Interaction Trigger
-    const btnVehicle = document.getElementById('btn-vehicle');
-    btnVehicle.onclick = () => {
-      inVehicle = !inVehicle;
-      playerGroup.visible = !inVehicle;
-      if (!inVehicle) {
-        playerGroup.position.set(vehicleGroup.position.x + 2, getTerrainHeight(vehicleGroup.position.x + 2, vehicleGroup.position.z), vehicleGroup.position.z);
-      }
-      btnVehicle.innerHTML = inVehicle ? "EXIT<br>VEHICLE" : "ENTER<br>VEHICLE";
-    };
-
-    // --- MINIMAP RADAR ---
-    const miniCtx = document.getElementById('minimap-canvas').getContext('2d');
-    function updateMinimap() {
-      miniCtx.clearRect(0, 0, 100, 100);
-      miniCtx.fillStyle = '#38bdf8';
-      miniCtx.beginPath();
-      miniCtx.arc(50, 50, 4, 0, Math.PI * 2);
-      miniCtx.fill();
-
-      // Render Zombies on Radar Map
-      zombies.forEach(z => {
-        const dx = (z.position.x - playerGroup.position.x) * 0.7;
-        const dz = (z.position.z - playerGroup.position.z) * 0.7;
-        if (Math.hypot(dx, dz) < 45) {
-          miniCtx.fillStyle = z.userData.isBoss ? '#dc2626' : '#22c55e';
-          miniCtx.beginPath();
-          miniCtx.arc(50 + dx, 50 + dz, z.userData.isBoss ? 4 : 2, 0, Math.PI * 2);
-          miniCtx.fill();
-        }
-      });
-    }
-
-    // --- MAIN GAME RENDER LOOP ---
-    function animate() {
-      requestAnimationFrame(animate);
-
-      // --- DYNAMIC DAY & NIGHT ENGINE ---
-      dayTime += 0.0003;
-      sunLight.position.x = Math.cos(dayTime) * 200;
-      sunLight.position.y = Math.sin(dayTime) * 200;
-      isNight = sunLight.position.y < 0;
-
-      scene.background.lerp(isNight ? skyColorNight : skyColorDay, 0.02);
-      ambientLight.intensity = isNight ? 0.2 : 0.65;
-
-      // --- MOVEMENT ENGINE ---
-      const activeObj = inVehicle ? vehicleGroup : playerGroup;
-      if (Math.abs(joystickInput.x) > 0.1 || Math.abs(joystickInput.y) > 0.1) {
-        const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraYaw);
-        const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraYaw);
-
-        const moveDir = new THREE.Vector3()
-          .addScaledVector(right, joystickInput.x)
-          .addScaledVector(forward, joystickInput.y)
-          .normalize();
-
-        const speed = inVehicle ? 0.8 : playerSpeed;
-        activeObj.position.x += moveDir.x * speed;
-        activeObj.position.z += moveDir.z * speed;
-        activeObj.rotation.y = Math.atan2(moveDir.x, moveDir.z);
-      }
-
-      // Snap Objects to Terrain Height Surface
-      activeObj.position.y = getTerrainHeight(activeObj.position.x, activeObj.position.z);
-      if (inVehicle) playerGroup.position.copy(vehicleGroup.position);
-
-      // --- CAMERA THIRD PERSON ENGINE ---
-      const camDist = inVehicle ? 9 : 6;
-      camera.position.x = activeObj.position.x - Math.sin(cameraYaw) * camDist;
-      camera.position.z = activeObj.position.z - Math.cos(cameraYaw) * camDist;
-      camera.position.y = activeObj.position.y + 3 + Math.sin(cameraPitch) * 3;
-      camera.lookAt(activeObj.position.x, activeObj.position.y + 1.5, activeObj.position.z);
-
-      // --- SURVIVAL VITALS DRAIN ENGINE ---
-      vitals.hunger = Math.max(0, vitals.hunger - 0.004);
-      vitals.thirst = Math.max(0, vitals.thirst - 0.007);
-      if (isNight) vitals.temp = Math.max(20, vitals.temp - 0.01);
-      else vitals.temp = Math.min(100, vitals.temp + 0.01);
-
-      document.getElementById('fill-hp').style.width = vitals.hp + '%';
-      document.getElementById('fill-hunger').style.width = vitals.hunger + '%';
-      document.getElementById('fill-thirst').style.width = vitals.thirst + '%';
-      document.getElementById('fill-temp').style.width = vitals.temp + '%';
-
-      // --- SMART ZOMBIE AI CHASE & DAMAGE ENGINE ---
-      const nightSpeedMultiplier = isNight ? 1.8 : 1.0;
-      zombies.forEach((z, idx) => {
-        const dir = new THREE.Vector3().subVectors(activeObj.position, z.position).normalize();
-        const moveSpeed = z.userData.speed * nightSpeedMultiplier;
-        z.position.add(dir.multiplyScalar(moveSpeed));
-        z.position.y = getTerrainHeight(z.position.x, z.position.z);
-        z.lookAt(activeObj.position.x, z.position.y, activeObj.position.z);
-
-        // Vehicle Crush Zombies Mechanics
-        if (inVehicle && vehicleGroup.position.distanceTo(z.position) < 2.5) {
-          scene.remove(z);
-          zombies.splice(idx, 1);
-          spawnZombie(false);
-        }
-
-        // Damage Player
-        if (!inVehicle && z.position.distanceTo(playerGroup.position) < 1.5) {
-          vitals.hp = Math.max(0, vitals.hp - (z.userData.isBoss ? 0.8 : 0.3));
-        }
-      });
-
-      // Vehicle Proximity Prompt
-      const distToCar = playerGroup.position.distanceTo(vehicleGroup.position);
-      btnVehicle.style.display = (distToCar < 4.5 || inVehicle) ? 'flex' : 'none';
-
-      updateMinimap();
-      renderer.render(scene, camera);
-    }
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
+    window.addEventListener('resize',()=>{ camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth,window.innerHeight); });
     animate();
   </script>
 </body>
