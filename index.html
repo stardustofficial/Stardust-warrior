@@ -103,13 +103,13 @@
       background: linear-gradient(135deg, #16a34a, #15803d);
     }
 
-    /* IN-GAME TOP RIGHT CONTROLS */
+    /* IN-GAME TOP RIGHT CONTROLS & MINI MAP */
     #top-right-controls {
       position: absolute;
       top: 15px;
       right: 20px;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 12px;
       z-index: 30;
       pointer-events: auto;
@@ -141,8 +141,55 @@
       backdrop-filter: blur(6px);
     }
 
-    .btn-icon-hud:active {
-      background: rgba(56, 189, 248, 0.3);
+    /* Mini Map Canvas */
+    #minimap-container {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.85);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      cursor: pointer;
+    }
+
+    #minimap-canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* FULL MAP MODAL */
+    #fullmap-modal {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80vw;
+      height: 80vh;
+      background: rgba(15, 23, 42, 0.95);
+      border: 2px solid #38bdf8;
+      border-radius: 12px;
+      z-index: 200;
+      pointer-events: auto;
+      padding: 16px;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+    }
+
+    #fullmap-header {
+      display: flex;
+      justify-content: space-between;
+      color: #38bdf8;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    #fullmap-canvas {
+      width: 100%;
+      height: calc(100% - 30px);
+      background: #1e293b;
+      border-radius: 8px;
     }
 
     /* HUD LAYER */
@@ -223,6 +270,24 @@
     #btn-lie { bottom: 30px; right: 125px; width: 54px; height: 54px; }
     #btn-reload { bottom: 175px; right: 125px; width: 48px; height: 48px; background: rgba(234, 179, 8, 0.7); }
 
+    /* Enter Vehicle Button */
+    #btn-vehicle {
+      display: none;
+      position: absolute;
+      bottom: 110px;
+      right: 220px;
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      background: rgba(37, 99, 235, 0.85);
+      border: 2px solid #93c5fd;
+      color: #fff;
+      font-size: 10px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 1.2;
+    }
+
     /* Top Left HUD Panel */
     #hud-panel {
       display: none;
@@ -291,8 +356,6 @@
     }
 
     #hp-bar { background: linear-gradient(90deg, #ef4444, #22c55e); }
-    #hunger-bar { background: #f59e0b; }
-    #thirst-bar { background: #06b6d4; }
 
     /* Inventory Modal Grid */
     #inventory-modal {
@@ -343,11 +406,6 @@
       color: #94a3b8;
     }
 
-    .inv-slot.active {
-      border-color: #38bdf8;
-      background: rgba(56, 189, 248, 0.1);
-    }
-
     #portrait-warning {
       display: none;
       position: absolute;
@@ -383,7 +441,7 @@
     <button id="btn-start-game" class="btn-start">START GAME</button>
   </div>
 
-  <!-- IN-GAME TOP RIGHT CONTROLS (Gun Selector + Bag Inventory) -->
+  <!-- IN-GAME TOP RIGHT CONTROLS -->
   <div id="top-right-controls" style="display:none;">
     <select id="gun-select" class="gun-select-box">
       <option value="AR Rifle">AR Rifle</option>
@@ -394,6 +452,19 @@
     <div id="btn-bag" class="btn-icon-hud">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
     </div>
+    <!-- Mini-Map -->
+    <div id="minimap-container">
+      <canvas id="minimap-canvas" width="100" height="100"></canvas>
+    </div>
+  </div>
+
+  <!-- FULL SCREEN MAP MODAL -->
+  <div id="fullmap-modal">
+    <div id="fullmap-header">
+      <span>TACTICAL BATTLE MAP</span>
+      <button id="btn-close-fullmap" style="background:none; border:none; color:#fff; font-size:16px; cursor:pointer;">X</button>
+    </div>
+    <canvas id="fullmap-canvas"></canvas>
   </div>
 
   <!-- IN-GAME HUD PANEL -->
@@ -437,12 +508,11 @@
     <div id="btn-sit" class="action-btn">SIT</div>
     <div id="btn-lie" class="action-btn">LIE</div>
     <div id="btn-reload" class="action-btn">RELOAD</div>
+    <div id="btn-vehicle" class="action-btn">ENTER<br>CAR</div>
 
     <!-- Survival Vitals Bars -->
     <div id="vitals-container">
       <div class="vital-bar-bg"><div id="hp-bar" class="vital-bar-fill"></div></div>
-      <div class="vital-bar-bg"><div id="hunger-bar" class="vital-bar-fill"></div></div>
-      <div class="vital-bar-bg"><div id="thirst-bar" class="vital-bar-fill"></div></div>
     </div>
   </div>
 
@@ -453,7 +523,7 @@
       <button id="btn-close-inv" style="background:none; border:none; color:#fff; font-size:16px; cursor:pointer;">X</button>
     </div>
     <div id="inventory-grid">
-      <div class="inv-slot active">Wood<br>x12</div>
+      <div class="inv-slot" style="color:#38bdf8;">Wood<br>x12</div>
       <div class="inv-slot">Stone<br>x8</div>
       <div class="inv-slot">Iron<br>x4</div>
       <div class="inv-slot">Food<br>x3</div>
@@ -486,21 +556,6 @@
         gain.connect(this.ctx.destination);
         osc.start();
         osc.stop(now + 0.18);
-      },
-      playFootstep() {
-        this.init();
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(80, now);
-        osc.frequency.exponentialRampToValueAtTime(20, now + 0.05);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(now + 0.05);
       }
     };
 
@@ -508,7 +563,7 @@
     const container = document.getElementById('canvas-container');
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x38bdf8);
-    scene.fog = new THREE.FogExp2(0x38bdf8, 0.005);
+    scene.fog = new THREE.FogExp2(0x38bdf8, 0.004);
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1200);
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
@@ -517,15 +572,13 @@
     container.appendChild(renderer.domElement);
 
     // --- LIGHTS ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
-    scene.add(ambientLight);
-
+    scene.add(new THREE.AmbientLight(0xffffff, 0.65));
     const sunLight = new THREE.DirectionalLight(0xfffbe1, 1.2);
     sunLight.position.set(100, 150, 50);
     sunLight.castShadow = true;
     scene.add(sunLight);
 
-    // --- ENVIRONMENT ---
+    // --- ENVIRONMENT WORLD (ROADS & RIVER) ---
     const worldSize = 800;
     const groundMat = new THREE.MeshStandardMaterial({ color: 0x3f6212, roughness: 0.9 });
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(worldSize, worldSize), groundMat);
@@ -533,7 +586,26 @@
     ground.receiveShadow = true;
     scene.add(ground);
 
-    // Dynamic Mountains & Trees
+    // Roads Grid (Asphalt)
+    const roadMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6 });
+    const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(16, worldSize), roadMat);
+    mainRoad.rotation.x = -Math.PI / 2;
+    mainRoad.position.y = 0.05;
+    scene.add(mainRoad);
+
+    const crossRoad = new THREE.Mesh(new THREE.PlaneGeometry(worldSize, 16), roadMat);
+    crossRoad.rotation.x = -Math.PI / 2;
+    crossRoad.position.y = 0.05;
+    scene.add(crossRoad);
+
+    // River Water
+    const riverMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.1, metalness: 0.8 });
+    const river = new THREE.Mesh(new THREE.PlaneGeometry(30, worldSize), riverMat);
+    river.rotation.x = -Math.PI / 2;
+    river.position.set(120, 0.02, 0);
+    scene.add(river);
+
+    // Mountains & Trees
     for (let i = 0; i < 15; i++) {
       const height = 40 + Math.random() * 50;
       const mountain = new THREE.Mesh(
@@ -581,16 +653,32 @@
     gunGroup.add(muzzleFlash);
     characterGroup.add(gunGroup);
 
+    // --- DRIVABLE CAR SETUP ---
+    const carGroup = new THREE.Group();
+    const carBody = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.2, 4.2), new THREE.MeshStandardMaterial({ color: 0xd97706 }));
+    carBody.position.y = 0.8;
+    carGroup.add(carBody);
+
+    const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.9, 2.2), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+    cabin.position.set(0, 1.7, -0.2);
+    carGroup.add(cabin);
+
+    carGroup.position.set(10, 0, 10);
+    scene.add(carGroup);
+
+    let inVehicle = false;
+    let carSpeed = 0;
+
     // Player Stats
     const player = {
-      hp: 100, maxHp: 100, hunger: 100, thirst: 100,
+      hp: 100,
       level: 1, xp: 0, kills: 0,
       ammo: 30, maxAmmo: 30, reserveAmmo: 120,
       y: 0, velocityY: 0, isGrounded: true, mode: 'stand',
-      currentWeapon: 'AR Rifle'
+      currentWeapon: 'AR Rifle',
+      speed: 0.38 // Fast Speed Boost
     };
 
-    // Game Mode State
     let isGameStarted = false;
     let lobbyAngle = 0;
 
@@ -611,21 +699,21 @@
       zombieGroup.add(zHead);
 
       const angle = Math.random() * Math.PI * 2;
-      const dist = 35 + Math.random() * 40;
+      const dist = 40 + Math.random() * 40;
       zombieGroup.position.set(
         characterGroup.position.x + Math.cos(angle) * dist,
         0,
         characterGroup.position.z + Math.sin(angle) * dist
       );
 
-      zombieGroup.userData = { currentHp: 100, speed: 0.05 };
+      zombieGroup.userData = { currentHp: 100, speed: 0.08 };
       scene.add(zombieGroup);
       zombies.push(zombieGroup);
     }
 
-    for (let i = 0; i < 10; i++) spawnZombie();
+    for (let i = 0; i < 15; i++) spawnZombie();
 
-    // --- LOBBY TO GAME START TRANSITION ---
+    // --- LOBBY START ---
     document.getElementById('btn-start-game').addEventListener('click', () => {
       isGameStarted = true;
       document.getElementById('lobby-screen').style.display = 'none';
@@ -635,7 +723,7 @@
       document.getElementById('crosshair').style.display = 'block';
     });
 
-    // --- GUN CHANGE SELECTOR ---
+    // --- GUN SELECTOR ---
     const gunSelect = document.getElementById('gun-select');
     gunSelect.addEventListener('change', (e) => {
       player.currentWeapon = e.target.value;
@@ -648,16 +736,21 @@
       document.getElementById('hud-ammo').innerText = `${player.ammo}/${player.reserveAmmo}`;
     });
 
-    // --- BAG / INVENTORY TOGGLE ---
+    // --- BAG & MAP MODALS ---
     const invModal = document.getElementById('inventory-modal');
     document.getElementById('btn-bag').addEventListener('click', () => {
       invModal.style.display = (invModal.style.display === 'block') ? 'none' : 'block';
     });
-    document.getElementById('btn-close-inv').addEventListener('click', () => {
-      invModal.style.display = 'none';
-    });
+    document.getElementById('btn-close-inv').addEventListener('click', () => invModal.style.display = 'none');
 
-    // --- CONTROLS & TOUCH SWIPE ---
+    const fullMapModal = document.getElementById('fullmap-modal');
+    document.getElementById('minimap-container').addEventListener('click', () => {
+      fullMapModal.style.display = 'flex';
+      renderFullMap();
+    });
+    document.getElementById('btn-close-fullmap').addEventListener('click', () => fullMapModal.style.display = 'none');
+
+    // --- TOUCH CAMERA ROTATION (FIXED INVERSION) ---
     let cameraAngleYaw = 0;
     let cameraAnglePitch = 0.2;
     let isSwiping = false;
@@ -680,9 +773,12 @@
         if (e.touches[i].clientX > window.innerWidth / 3) {
           const dx = e.touches[i].clientX - lastTouchX;
           const dy = e.touches[i].clientY - lastTouchY;
+          
           cameraAngleYaw -= dx * 0.005;
-          cameraAnglePitch += dy * 0.003;
-          cameraAnglePitch = Math.max(-0.1, Math.min(Math.PI / 2.5, cameraAnglePitch));
+          // FIXED Y-AXIS LOOK: Swipe Up = Look Up, Swipe Down = Look Down
+          cameraAnglePitch -= dy * 0.003; 
+          cameraAnglePitch = Math.max(-0.4, Math.min(Math.PI / 2.5, cameraAnglePitch));
+          
           lastTouchX = e.touches[i].clientX;
           lastTouchY = e.touches[i].clientY;
         }
@@ -690,7 +786,7 @@
     });
     window.addEventListener('touchend', () => isSwiping = false);
 
-    // Joystick Logic
+    // --- JOYSTICK LOGIC (FIXED DIRECTION) ---
     let joystickInput = { x: 0, y: 0 };
     const joystickContainer = document.getElementById('joystick-container');
     const joystickKnob = document.getElementById('joystick-knob');
@@ -714,8 +810,10 @@
       const angle = Math.atan2(dy, dx);
 
       joystickKnob.style.transform = `translate(calc(-50% + ${Math.cos(angle) * dist}px), calc(-50% + ${Math.sin(angle) * dist}px))`;
+      
+      // FIXED INVERTED JOYSTICK: Forward = Ahead, Back = Backwards
       joystickInput.x = (Math.cos(angle) * dist) / 40;
-      joystickInput.y = (Math.sin(angle) * dist) / 40;
+      joystickInput.y = -(Math.sin(angle) * dist) / 40; 
     }
 
     function handleJoystickEnd() {
@@ -728,35 +826,44 @@
     window.addEventListener('touchmove', handleJoystickMove);
     window.addEventListener('touchend', handleJoystickEnd);
 
-    // --- SHOOTING MECHANICS ---
+    // --- SHOOTING & VEHICLE INTERACTION ---
     const bullets = [];
-
     function shoot() {
-      if (!isGameStarted || player.ammo <= 0) return;
+      if (!isGameStarted || player.ammo <= 0 || inVehicle) return;
       player.ammo--;
       document.getElementById('hud-ammo').innerText = `${player.ammo}/${player.reserveAmmo}`;
-
       AudioEngine.playGunshot();
 
       muzzleFlash.material.opacity = 1;
       setTimeout(() => muzzleFlash.material.opacity = 0, 40);
 
-      const bullet = new THREE.Mesh(
-        new THREE.SphereGeometry(0.12, 8, 8),
-        new THREE.MeshBasicMaterial({ color: 0xfacc15 })
-      );
-
+      const bullet = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0xfacc15 }));
       bullet.position.set(characterGroup.position.x + 0.35, characterGroup.position.y + 1.35, characterGroup.position.z);
-
       const dir = new THREE.Vector3();
       camera.getWorldDirection(dir);
-      bullet.velocity = dir.multiplyScalar(1.5);
+      bullet.velocity = dir.multiplyScalar(1.8);
 
       scene.add(bullet);
       bullets.push(bullet);
     }
 
-    function reload() {
+    const btnVehicle = document.getElementById('btn-vehicle');
+    btnVehicle.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      inVehicle = !inVehicle;
+      if (inVehicle) {
+        characterGroup.visible = false;
+        btnVehicle.innerHTML = "EXIT<br>CAR";
+      } else {
+        characterGroup.visible = true;
+        characterGroup.position.set(carGroup.position.x + 2, 0, carGroup.position.z);
+        btnVehicle.innerHTML = "ENTER<br>CAR";
+      }
+    });
+
+    document.getElementById('btn-fire').addEventListener('touchstart', (e) => { e.preventDefault(); shoot(); });
+    document.getElementById('btn-reload').addEventListener('touchstart', (e) => {
+      e.preventDefault();
       const needed = player.maxAmmo - player.ammo;
       if (needed > 0 && player.reserveAmmo > 0) {
         const transfer = Math.min(needed, player.reserveAmmo);
@@ -764,62 +871,104 @@
         player.ammo += transfer;
         document.getElementById('hud-ammo').innerText = `${player.ammo}/${player.reserveAmmo}`;
       }
+    });
+
+    // --- MINI MAP & FULL MAP DRAWING ---
+    const miniCanvas = document.getElementById('minimap-canvas');
+    const miniCtx = miniCanvas.getContext('2d');
+
+    function drawRadarMap(ctx, width, height, scale) {
+      ctx.clearRect(0, 0, width, height);
+      const centerX = width / 2;
+      const centerY = height / 2;
+
+      // Draw Player Position
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw Zombies
+      ctx.fillStyle = '#ef4444';
+      zombies.forEach(z => {
+        const dx = (z.position.x - characterGroup.position.x) * scale;
+        const dz = (z.position.z - characterGroup.position.z) * scale;
+        if (Math.hypot(dx, dz) < width / 2) {
+          ctx.beginPath();
+          ctx.arc(centerX + dx, centerY + dz, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
     }
 
-    document.getElementById('btn-fire').addEventListener('touchstart', (e) => { e.preventDefault(); shoot(); });
-    document.getElementById('btn-reload').addEventListener('touchstart', (e) => { e.preventDefault(); reload(); });
-    document.getElementById('btn-jump').addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      if (player.isGrounded) { player.velocityY = 0.22; player.isGrounded = false; }
-    });
-    document.getElementById('btn-sit').addEventListener('touchstart', (e) => {
-      e.preventDefault(); player.mode = (player.mode === 'sit') ? 'stand' : 'sit';
-    });
-    document.getElementById('btn-lie').addEventListener('touchstart', (e) => {
-      e.preventDefault(); player.mode = (player.mode === 'lie') ? 'stand' : 'lie';
-    });
+    function renderFullMap() {
+      const canvas = document.getElementById('fullmap-canvas');
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+      const ctx = canvas.getContext('2d');
+      drawRadarMap(ctx, canvas.width, canvas.height, 0.8);
+    }
 
-    // --- MAIN RENDER & ANIMATION LOOP ---
+    // --- MAIN RENDER & GAME LOOP ---
     function animate() {
       requestAnimationFrame(animate);
 
       if (!isGameStarted) {
-        // Aesthetic Lobby Camera Rotation around Player Center
         lobbyAngle += 0.005;
         camera.position.x = characterGroup.position.x + Math.sin(lobbyAngle) * 4.5;
         camera.position.z = characterGroup.position.z + Math.cos(lobbyAngle) * 4.5;
         camera.position.y = 2.0;
         camera.lookAt(characterGroup.position.x, 1.4, characterGroup.position.z);
       } else {
-        // In-Game Mechanics Loop
-        let moveSpeed = 0.14;
-        if (player.mode === 'sit') moveSpeed = 0.06;
-        if (player.mode === 'lie') moveSpeed = 0.03;
+        // Toggle Vehicle Enter Button Proximity
+        const distToCar = characterGroup.position.distanceTo(carGroup.position);
+        btnVehicle.style.display = (distToCar < 4 || inVehicle) ? 'flex' : 'none';
 
-        if (!player.isGrounded) {
-          player.y += player.velocityY;
-          player.velocityY -= 0.01;
-          if (player.y <= 0) { player.y = 0; player.isGrounded = true; }
-        }
-        characterGroup.position.y = player.y;
+        if (!inVehicle) {
+          // --- CHARACTER MOVEMENT ---
+          if (Math.abs(joystickInput.x) > 0.1 || Math.abs(joystickInput.y) > 0.1) {
+            const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
+            const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
 
-        if (Math.abs(joystickInput.x) > 0.1 || Math.abs(joystickInput.y) > 0.1) {
-          const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
-          const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
+            const moveDir = new THREE.Vector3()
+              .addScaledVector(right, joystickInput.x)
+              .addScaledVector(forward, joystickInput.y)
+              .normalize();
 
-          const moveDir = new THREE.Vector3()
-            .addScaledVector(right, joystickInput.x)
-            .addScaledVector(forward, joystickInput.y)
-            .normalize();
-
-          characterGroup.position.x += moveDir.x * moveSpeed;
-          characterGroup.position.z += moveDir.z * moveSpeed;
-          characterGroup.rotation.y = Math.atan2(moveDir.x, moveDir.z);
+            characterGroup.position.x += moveDir.x * player.speed;
+            characterGroup.position.z += moveDir.z * player.speed;
+            characterGroup.rotation.y = Math.atan2(moveDir.x, moveDir.z);
+          }
         } else {
-          characterGroup.rotation.y = cameraAngleYaw;
+          // --- CAR DRIVING MECHANICS ---
+          if (Math.abs(joystickInput.y) > 0.1) {
+            carSpeed = joystickInput.y * 0.8; // High speed vehicle drive
+            carGroup.translateZ(-carSpeed);
+          }
+          if (Math.abs(joystickInput.x) > 0.1) {
+            carGroup.rotation.y -= joystickInput.x * 0.04;
+          }
+          characterGroup.position.copy(carGroup.position);
+
+          // CRUSH ZOMBIES WITH VEHICLE
+          for (let j = zombies.length - 1; j >= 0; j--) {
+            if (carGroup.position.distanceTo(zombies[j].position) < 2.2) {
+              scene.remove(zombies[j]);
+              zombies.splice(j, 1);
+              player.kills++;
+              zombiesRemaining--;
+              player.xp += 20;
+
+              document.getElementById('hud-kills').innerText = player.kills;
+              document.getElementById('hud-zombies').innerText = zombiesRemaining;
+              document.getElementById('hud-xp').innerText = `${player.xp}/100`;
+
+              if (zombiesRemaining > 0) spawnZombie();
+            }
+          }
         }
 
-        // Update Bullets
+        // --- BULLET MECHANICS ---
         for (let i = bullets.length - 1; i >= 0; i--) {
           const b = bullets[i];
           b.position.add(b.velocity);
@@ -854,37 +1003,40 @@
           }
         }
 
-        // Zombies AI
+        // --- ZOMBIE AI ---
+        const targetPos = inVehicle ? carGroup.position : characterGroup.position;
         zombies.forEach(z => {
-          const dir = new THREE.Vector3().subVectors(characterGroup.position, z.position).normalize();
+          const dir = new THREE.Vector3().subVectors(targetPos, z.position).normalize();
           z.position.add(dir.multiplyScalar(z.userData.speed));
-          z.lookAt(characterGroup.position.x, z.position.y, characterGroup.position.z);
+          z.lookAt(targetPos.x, z.position.y, targetPos.z);
 
-          if (z.position.distanceTo(characterGroup.position) < 1.4) {
+          if (!inVehicle && z.position.distanceTo(characterGroup.position) < 1.4) {
             player.hp = Math.max(0, player.hp - 0.35);
             document.getElementById('hp-bar').style.width = player.hp + '%';
 
             if (player.hp <= 0) {
-              alert('Game Over! Restarting session...');
+              alert('Game Over! Restarting...');
               location.reload();
             }
           }
         });
 
-        // Over the Shoulder PUBG Camera
-        const camDist = 5.5;
-        const camHeight = 2.2;
-        const shoulderOffset = 0.95;
+        // --- CAMERA CONTROLS ---
+        const activeObj = inVehicle ? carGroup : characterGroup;
+        const camDist = inVehicle ? 8.5 : 5.5;
+        const camHeight = inVehicle ? 3.5 : 2.2;
 
         const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
         const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
 
-        camera.position.x = characterGroup.position.x + right.x * shoulderOffset - forward.x * camDist;
-        camera.position.y = characterGroup.position.y + camHeight + Math.sin(cameraAnglePitch) * 2;
-        camera.position.z = characterGroup.position.z + right.z * shoulderOffset - forward.z * camDist;
+        camera.position.x = activeObj.position.x - forward.x * camDist;
+        camera.position.y = activeObj.position.y + camHeight + Math.sin(cameraAnglePitch) * 2;
+        camera.position.z = activeObj.position.z - forward.z * camDist;
 
-        const targetLook = characterGroup.position.clone().add(forward.clone().multiplyScalar(20)).add(right.clone().multiplyScalar(shoulderOffset));
-        camera.lookAt(targetLook);
+        camera.lookAt(activeObj.position.x, activeObj.position.y + 1.2, activeObj.position.z);
+
+        // Update Mini-Map
+        drawRadarMap(miniCtx, 100, 100, 0.9);
       }
 
       renderer.render(scene, camera);
