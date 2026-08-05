@@ -404,7 +404,9 @@
     for(let i = 0; i < 12; i++) spawnZombie();
 
     // --- CONTROLS & CAMERA ---
-    let cameraAngleYaw = 0, cameraAnglePitch = 0.2, isSwiping = false, lastTX = 0, lastTY = 0;
+    // Smooth camera: use lerp to make swipe feel smooth
+    let cameraAngleYaw = 0, cameraAnglePitch = 0.2, targetYaw = 0, targetPitch = 0.2;
+    let isSwiping = false, lastTX = 0, lastTY = 0;
     window.addEventListener('touchstart', (e) => {
       if(!isGameStarted) return;
       for(let t of e.touches) {
@@ -416,8 +418,8 @@
       for(let t of e.touches) {
         if(t.clientX > window.innerWidth / 3) {
           const dx = t.clientX - lastTX; const dy = t.clientY - lastTY;
-          cameraAngleYaw -= dx * 0.005; cameraAnglePitch -= dy * 0.003;
-          cameraAnglePitch = Math.max(-0.3, Math.min(Math.PI / 2.8, cameraAnglePitch));
+          targetYaw -= dx * 0.005; targetPitch -= dy * 0.003;
+          targetPitch = Math.max(-0.3, Math.min(Math.PI / 2.8, targetPitch));
           lastTX = t.clientX; lastTY = t.clientY;
         }
       }
@@ -593,6 +595,10 @@
         camera.position.z = characterGroup.position.z + 5;
         camera.position.y = 2.5; camera.lookAt(characterGroup.position);
       } else {
+        // Smooth camera lerp
+        cameraAngleYaw += (targetYaw - cameraAngleYaw) * 0.12;
+        cameraAnglePitch += (targetPitch - cameraAnglePitch) * 0.12;
+
         // Vehicle proximity
         let nearVeh = false;
         vehicles.forEach(v => { if(characterGroup.position.distanceTo(v.position) < 5) nearVeh = true; });
@@ -704,14 +710,26 @@
           }
         });
 
-        // Third Person Camera
+        // Third Person Camera - keep character slightly left of center, crosshair fixed on screen center
         const activeObj = activeVehicle || characterGroup;
-        const camDist = activeVehicle ? 8.5 : 5.5; const camHeight = activeVehicle ? 3.5 : 2.2;
+        const camDist = activeVehicle ? 8.5 : 5.5; 
+        const camHeight = activeVehicle ? 3.5 : 2.2;
+        // Use smooth yaw/pitch for camera
         const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
+        const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
         
-        camera.position.x = activeObj.position.x - forward.x * camDist;
-        camera.position.y = activeObj.position.y + camHeight + Math.sin(cameraAnglePitch) * 2;
-        camera.position.z = activeObj.position.z - forward.z * camDist;
+        // Camera position: behind and above, with slight offset to keep character left of center
+        const offset = new THREE.Vector3(0, 0, 0);
+        // Add a small right offset so character is not dead center, crosshair remains center
+        offset.addScaledVector(right, -1.2); 
+        offset.addScaledVector(new THREE.Vector3(0, 1, 0), Math.sin(cameraAnglePitch) * 1.5);
+        
+        const camPos = new THREE.Vector3().copy(activeObj.position)
+          .addScaledVector(forward, -camDist)
+          .add(new THREE.Vector3(0, camHeight, 0))
+          .add(offset);
+        
+        camera.position.lerp(camPos, 0.15);
         camera.lookAt(activeObj.position.x, activeObj.position.y + 1.2, activeObj.position.z);
 
         drawRadarMap(miniCtx, 90, 90, 0.8);
