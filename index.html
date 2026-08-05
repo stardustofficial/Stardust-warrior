@@ -9,7 +9,7 @@
     html, body { width: 100%; height: 100%; overflow: hidden; background: #0b0e14; font-family: 'Segoe UI', system-ui, sans-serif; }
     #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
     
-    /* Center Screen Crosshair - screen fixed, not on character */
+    /* Center Screen Crosshair - Fixed in center screen */
     #crosshair { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; pointer-events: none; z-index: 999; }
     #crosshair::before, #crosshair::after { content: ''; position: absolute; background: rgba(255, 255, 255, 0.9); box-shadow: 0 0 4px #000; }
     #crosshair::before { top: 11px; left: 0; width: 24px; height: 2px; }
@@ -27,24 +27,20 @@
     #joystick-container { position: absolute; bottom: 35px; left: 40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.25); border-radius: 50%; backdrop-filter: blur(6px); pointer-events: auto; touch-action: none; }
     #joystick-knob { position: absolute; top: 50%; left: 50%; width: 46px; height: 46px; background: rgba(255,255,255,0.7); border-radius: 50%; transform: translate(-50%,-50%); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
     
-    /* Re-arranged Action Buttons (right side) */
-    .action-btn { position: absolute; background: rgba(15, 23, 42, 0.75); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 700; font-size: 11px; backdrop-filter: blur(4px); pointer-events: auto; touch-action: manipulation; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-    .action-btn:active { background: rgba(34,197,94,0.85); transform: scale(0.92); }
+    /* Action Buttons Base */
+    .action-btn { position: absolute; background: rgba(15, 23, 42, 0.8); color: #fff; border: 1.5px solid rgba(255,255,255,0.35); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 700; font-size: 11px; backdrop-filter: blur(6px); pointer-events: auto; touch-action: manipulation; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+    .action-btn:active, .action-btn.active { background: rgba(34,197,94,0.85); transform: scale(0.92); }
     
-    /* Fire button - right side, slightly left of jump */
-    #btn-fire { bottom: 120px; right: 150px; width: 72px; height: 72px; background: rgba(220,38,38,0.85); border-color: #fca5a5; font-size: 13px; }
-    /* Jump button - above sit */
-    #btn-jump { bottom: 180px; right: 40px; width: 60px; height: 60px; }
-    /* Sit button - bottom right */
-    #btn-sit { bottom: 30px; right: 40px; width: 60px; height: 60px; }
-    /* Lie button - below fire, slightly left */
-    #btn-lie { bottom: 30px; right: 140px; width: 60px; height: 60px; }
-    /* Reload button - kept small near fire */
-    #btn-reload { bottom: 120px; right: 50px; width: 52px; height: 52px; background: rgba(234,179,8,0.75); }
+    /* SPECIFIC LAYOUT: Fire -> Jump (Right) -> Sit (Below Jump) -> Lie (Left of Sit) -> Reload (Left of Lie) */
+    #btn-fire { bottom: 100px; right: 155px; width: 70px; height: 70px; background: rgba(220,38,38,0.85); border-color: #fca5a5; font-size: 13px; }
+    #btn-jump { bottom: 105px; right: 80px; width: 58px; height: 58px; }
+    #btn-sit { bottom: 35px; right: 80px; width: 58px; height: 58px; }
+    #btn-lie { bottom: 35px; right: 150px; width: 58px; height: 58px; }
+    #btn-reload { bottom: 35px; right: 220px; width: 58px; height: 58px; background: rgba(234,179,8,0.85); border-color: #fef08a; }
     
     #btn-vehicle-enter { display: none; position: absolute; bottom: 180px; right: 140px; width: 68px; height: 68px; border-radius: 14px; background: rgba(37,99,235,0.85); border: 2px solid #93c5fd; color: #fff; font-size: 10px; font-weight: bold; text-align: center; pointer-events: auto; justify-content: center; align-items: center; backdrop-filter: blur(6px); }
 
-    /* Vehicle Drive UI - rearranged: forward right, backward left */
+    /* Vehicle Drive UI */
     #car-ui-left { display: none; position: absolute; bottom: 35px; left: 40px; gap: 15px; pointer-events: auto; }
     #car-ui-right { display: none; position: absolute; bottom: 35px; right: 40px; gap: 15px; align-items: flex-end; pointer-events: auto; }
     .car-btn { width: 64px; height: 64px; background: rgba(15, 23, 42, 0.8); border: 2px solid rgba(255,255,255,0.3); border-radius: 16px; color: #fff; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(6px); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
@@ -61,7 +57,7 @@
     .lobby-title { color: #38bdf8; font-size: 32px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 16px rgba(56,189,248,0.6); }
     .btn-start { position: absolute; bottom: 40px; right: 40px; padding: 16px 42px; background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; font-size: 18px; font-weight: 800; border: 2px solid #86efac; border-radius: 12px; cursor: pointer; box-shadow: 0 6px 20px rgba(34,197,94,0.4); letter-spacing: 1px; }
 
-    /* Top Right Controls - map and exit, exit now small above map */
+    /* Top Right Controls */
     #top-right-controls { display: none; position: absolute; top: 15px; right: 20px; align-items: center; gap: 8px; z-index: 30; pointer-events: auto; flex-direction: column; }
     #minimap-container { width: 90px; height: 90px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8); overflow: hidden; background: rgba(15,23,42,0.85); box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; }
     #minimap-canvas { width: 100%; height: 100%; }
@@ -72,7 +68,7 @@
     #fullmap-header { display: flex; justify-content: space-between; color: #38bdf8; font-weight: bold; margin-bottom: 10px; font-size: 16px; }
     #fullmap-canvas { width: 100%; height: calc(100% - 30px); background: #1e293b; border-radius: 8px; }
 
-    /* Victory & Defeat Modals */
+    /* Modals */
     .game-modal { display: none; position: absolute; top:0; left:0; width:100%; height:100%; z-index:300; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); justify-content: center; align-items: center; flex-direction: column; color: #fff; pointer-events: auto; }
     .modal-box { background: linear-gradient(145deg, #1e293b, #0f172a); border-radius: 24px; padding: 35px 45px; text-align: center; max-width: 450px; width: 90%; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
     .modal-box.victory-theme { border: 2px solid #fbbf24; box-shadow: 0 0 50px rgba(251,191,36,0.3); }
@@ -127,7 +123,7 @@
     </div>
   </div>
 
-  <!-- Top Right Controls: Exit button (small) above minimap -->
+  <!-- Top Right Controls -->
   <div id="top-right-controls">
     <div id="btn-exit" class="btn-icon-hud" title="Exit to Lobby">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
@@ -148,14 +144,27 @@
   <div id="ui-layer">
     <div id="joystick-container"><div id="joystick-knob"></div></div>
     
+    <!-- Fire Button -->
     <div id="btn-fire" class="action-btn">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>
     </div>
+    
+    <!-- Jump Button (Right side of Fire) -->
     <div id="btn-jump" class="action-btn">JUMP</div>
+    
+    <!-- Sit Button (Below Jump) -->
     <div id="btn-sit" class="action-btn">SIT</div>
+    
+    <!-- Lie Button (Left side of Sit) -->
     <div id="btn-lie" class="action-btn">LIE</div>
-    <div id="btn-reload" class="action-btn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 11-.57-8.38l5.67-5.67"/></svg>
+
+    <!-- Reload Magazine Button (Left side of Lie) -->
+    <div id="btn-reload" class="action-btn" title="Reload Magazine">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+        <path d="M6 3h12v4H6zM8 7v14h8V7" />
+        <line x1="10" y1="11" x2="14" y2="11" />
+        <line x1="10" y1="15" x2="14" y2="15" />
+      </svg>
     </div>
 
     <div id="btn-vehicle-enter">
@@ -168,7 +177,7 @@
     </div>
   </div>
 
-  <!-- Car Control UI - rearranged: forward right, backward left -->
+  <!-- Car Control UI -->
   <div id="car-ui-left">
     <div id="btn-car-left" class="car-btn">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -219,7 +228,7 @@
     let gameStats = JSON.parse(localStorage.getItem('stardust_warrior_stats')) || { totalKills: 0, gamesPlayed: 0 };
     function saveStats() { localStorage.setItem('stardust_warrior_stats', JSON.stringify(gameStats)); }
 
-    // --- AUDIO SYNTHESIZER with more effects ---
+    // --- AUDIO SYNTHESIZER ---
     const AudioEngine = {
       ctx: null,
       init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); if(this.ctx.state === 'suspended') this.ctx.resume(); },
@@ -250,14 +259,6 @@
         osc.type = 'sawtooth'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
         gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
         osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.3);
-        // add a noise burst
-        const bufferSize = this.ctx.sampleRate * 0.1;
-        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for(let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / bufferSize * 3);
-        const noise = this.ctx.createBufferSource(); noise.buffer = buffer;
-        const ng = this.ctx.createGain(); ng.gain.setValueAtTime(0.3, now); ng.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-        noise.connect(ng); ng.connect(this.ctx.destination); noise.start(now); noise.stop(now + 0.1);
       },
       playHit() {
         this.init(); const now = this.ctx.currentTime;
@@ -311,28 +312,22 @@
     const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(16, worldSize), roadMat);
     mainRoad.rotation.x = -Math.PI / 2; mainRoad.position.y = 0.02; scene.add(mainRoad);
 
-    // Loot Crates as floating orange circles (ammo)
+    // Loot Crates
     const lootCrates = [];
     function spawnLootCrate(x, z) {
       const group = new THREE.Group();
-      // Orange circle (ring) floating
       const ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.9, 24), new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xf97316, emissiveIntensity: 0.3, side: THREE.DoubleSide }));
-      ring.rotation.x = -Math.PI / 2;
-      ring.position.y = 1.2;
-      group.add(ring);
-      // Glow sphere
+      ring.rotation.x = -Math.PI / 2; ring.position.y = 1.2; group.add(ring);
       const glow = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xf97316, emissiveIntensity: 0.5 }));
-      glow.position.y = 1.2;
-      group.add(glow);
-      group.position.set(x, 0, z);
-      scene.add(group);
+      glow.position.y = 1.2; group.add(glow);
+      group.position.set(x, 0, z); scene.add(group);
       lootCrates.push(group);
     }
     for(let i = 0; i < 35; i++) {
       spawnLootCrate((Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500);
     }
 
-    // Vehicles (faster)
+    // Vehicles
     const vehicles = [];
     function createVehicle(x, z, color) {
       const g = new THREE.Group();
@@ -348,16 +343,18 @@
     const car2 = createVehicle(-40, -50, 0x2563eb);
     let activeVehicle = null;
 
-    // Player Character
+    // Player Character Construction
     const characterGroup = new THREE.Group(); scene.add(characterGroup);
+    const bodyMeshGroup = new THREE.Group(); characterGroup.add(bodyMeshGroup);
+    
     const torso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), new THREE.MeshStandardMaterial({ color: 0x0284c7 }));
-    torso.position.y = 1.4; characterGroup.add(torso);
+    torso.position.y = 1.4; bodyMeshGroup.add(torso);
     const head = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), new THREE.MeshStandardMaterial({ color: 0xffdbac }));
-    head.position.y = 2.25; characterGroup.add(head);
+    head.position.y = 2.25; bodyMeshGroup.add(head);
     const gunMesh = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.85), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
-    gunMesh.position.set(0.38, 1.35, -0.4); characterGroup.add(gunMesh);
+    gunMesh.position.set(0.38, 1.35, -0.4); bodyMeshGroup.add(gunMesh);
 
-    // Player State - increased speed
+    // Player State
     const player = {
       hp: 100, kills: 0, ammo: 30, reserveAmmo: 120, maxClip: 30,
       speed: 0.7, yVelocity: 0, grounded: true, mode: 'stand'
@@ -366,7 +363,7 @@
     let zombiesRemaining = TOTAL_ZOMBIES;
     let isGameStarted = false;
 
-    // Zombies Array with Billboard Health Bar
+    // Zombies Array
     const zombies = [];
     function createHealthBarCanvas() {
       const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 12;
@@ -398,35 +395,55 @@
       
       const angle = Math.random() * Math.PI * 2; const dist = 35 + Math.random() * 45;
       g.position.set(characterGroup.position.x + Math.cos(angle)*dist, 0, characterGroup.position.z + Math.sin(angle)*dist);
-      g.userData = { hp: 100, speed: 0.12, hb: hb, radius: 0.8 }; // faster zombies
+      g.userData = { hp: 100, speed: 0.12, hb: hb, radius: 0.8 };
       scene.add(g); zombies.push(g);
     }
     for(let i = 0; i < 12; i++) spawnZombie();
 
-    // --- CONTROLS & CAMERA ---
-    // Smooth camera: use lerp to make swipe feel smooth
-    let cameraAngleYaw = 0, cameraAnglePitch = 0.2, targetYaw = 0, targetPitch = 0.2;
-    let isSwiping = false, lastTX = 0, lastTY = 0;
+    // --- SMOOTH CAMERA & TOUCH SWIPE CONTROLS ---
+    let targetYaw = 0, targetPitch = 0.15;
+    let cameraAngleYaw = 0, cameraAnglePitch = 0.15;
+    let isSwiping = false, activeTouchId = null, lastTX = 0, lastTY = 0;
+
     window.addEventListener('touchstart', (e) => {
       if(!isGameStarted) return;
-      for(let t of e.touches) {
-        if(t.clientX > window.innerWidth / 2) { isSwiping = true; lastTX = t.clientX; lastTY = t.clientY; }
-      }
-    });
-    window.addEventListener('touchmove', (e) => {
-      if(!isSwiping || !isGameStarted) return;
-      for(let t of e.touches) {
-        if(t.clientX > window.innerWidth / 3) {
-          const dx = t.clientX - lastTX; const dy = t.clientY - lastTY;
-          targetYaw -= dx * 0.005; targetPitch -= dy * 0.003;
-          targetPitch = Math.max(-0.3, Math.min(Math.PI / 2.8, targetPitch));
-          lastTX = t.clientX; lastTY = t.clientY;
+      for(let t of e.changedTouches) {
+        if(t.clientX > window.innerWidth / 3 && activeTouchId === null) {
+          isSwiping = true;
+          activeTouchId = t.identifier;
+          lastTX = t.clientX;
+          lastTY = t.clientY;
         }
       }
     });
-    window.addEventListener('touchend', () => isSwiping = false);
 
-    // Joystick
+    window.addEventListener('touchmove', (e) => {
+      if(!isSwiping || !isGameStarted) return;
+      for(let t of e.changedTouches) {
+        if(t.identifier === activeTouchId) {
+          const dx = t.clientX - lastTX;
+          const dy = t.clientY - lastTY;
+          
+          targetYaw -= dx * 0.004; // Smooth sensitivity
+          targetPitch -= dy * 0.003;
+          targetPitch = Math.max(-0.25, Math.min(Math.PI / 3, targetPitch));
+          
+          lastTX = t.clientX;
+          lastTY = t.clientY;
+        }
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchend', (e) => {
+      for(let t of e.changedTouches) {
+        if(t.identifier === activeTouchId) {
+          isSwiping = false;
+          activeTouchId = null;
+        }
+      }
+    });
+
+    // Joystick Control
     let joystickInput = { x: 0, y: 0 };
     const joyCont = document.getElementById('joystick-container');
     const joyKnob = document.getElementById('joystick-knob');
@@ -459,23 +476,82 @@
       AudioEngine.playGunshot();
 
       const b = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0xfacc15 }));
-      b.position.set(characterGroup.position.x, characterGroup.position.y + 1.4, characterGroup.position.z);
       
-      const dir = new THREE.Vector3(); camera.getWorldDirection(dir);
-      b.velocity = dir.multiplyScalar(3.0); // faster bullet
+      // Calculate origin point based on current character height
+      let heightOffset = 1.4;
+      if (player.mode === 'sit') heightOffset = 0.8;
+      if (player.mode === 'lie') heightOffset = 0.3;
+      
+      b.position.set(characterGroup.position.x, characterGroup.position.y + heightOffset, characterGroup.position.z);
+      
+      // Raycast shooting direction straight towards center aim point
+      const dir = new THREE.Vector3(); 
+      camera.getWorldDirection(dir);
+      b.velocity = dir.multiplyScalar(3.2); 
       scene.add(b); bullets.push(b);
     }
 
+    // --- BUTTON EVENT LISTENERS ---
     document.getElementById('btn-fire').addEventListener('touchstart', (e) => { e.preventDefault(); shoot(); });
+    
+    // Jump Button Functionality
+    document.getElementById('btn-jump').addEventListener('touchstart', (e) => { 
+      e.preventDefault(); 
+      if(player.grounded) { 
+        player.yVelocity = 0.28; 
+        player.grounded = false; 
+        player.mode = 'stand';
+        updateCharacterPose();
+      } 
+    });
+
+    // Sit Button Functionality
+    document.getElementById('btn-sit').addEventListener('touchstart', (e) => { 
+      e.preventDefault(); 
+      player.mode = (player.mode === 'sit') ? 'stand' : 'sit';
+      updateCharacterPose();
+    });
+
+    // Lie Button Functionality
+    document.getElementById('btn-lie').addEventListener('touchstart', (e) => { 
+      e.preventDefault(); 
+      player.mode = (player.mode === 'lie') ? 'stand' : 'lie';
+      updateCharacterPose();
+    });
+
+    // Magazine Reload Button Functionality
     document.getElementById('btn-reload').addEventListener('touchstart', (e) => {
       e.preventDefault();
       const needed = player.maxClip - player.ammo;
-      const reloadAmount = Math.min(needed, player.reserveAmmo);
-      player.ammo += reloadAmount; player.reserveAmmo -= reloadAmount; updateHUD();
+      if(needed > 0 && player.reserveAmmo > 0) {
+        const reloadAmount = Math.min(needed, player.reserveAmmo);
+        player.ammo += reloadAmount; 
+        player.reserveAmmo -= reloadAmount; 
+        updateHUD();
+      }
     });
-    document.getElementById('btn-jump').addEventListener('touchstart', (e) => { e.preventDefault(); if(player.grounded) { player.yVelocity = 0.3; player.grounded = false; } });
-    document.getElementById('btn-sit').addEventListener('touchstart', (e) => { e.preventDefault(); player.mode = player.mode === 'sit' ? 'stand' : 'sit'; });
-    document.getElementById('btn-lie').addEventListener('touchstart', (e) => { e.preventDefault(); player.mode = player.mode === 'lie' ? 'stand' : 'lie'; });
+
+    function updateCharacterPose() {
+      document.getElementById('btn-sit').classList.toggle('active', player.mode === 'sit');
+      document.getElementById('btn-lie').classList.toggle('active', player.mode === 'lie');
+
+      if (player.mode === 'sit') {
+        bodyMeshGroup.scale.set(1, 0.65, 1);
+        bodyMeshGroup.rotation.x = 0;
+        bodyMeshGroup.position.y = -0.3;
+        player.speed = 0.35;
+      } else if (player.mode === 'lie') {
+        bodyMeshGroup.scale.set(1, 1, 1);
+        bodyMeshGroup.rotation.x = -Math.PI / 2.3;
+        bodyMeshGroup.position.y = -0.7;
+        player.speed = 0.2;
+      } else { // Stand
+        bodyMeshGroup.scale.set(1, 1, 1);
+        bodyMeshGroup.rotation.x = 0;
+        bodyMeshGroup.position.y = 0;
+        player.speed = 0.7;
+      }
+    }
 
     // Vehicle Boarding
     const btnVeh = document.getElementById('btn-vehicle-enter');
@@ -508,9 +584,9 @@
       document.getElementById('joystick-container').style.display = inCar ? 'none' : 'block';
     }
 
-    // Car Controls - forward right, backward left, steering on left
+    // Car Controls
     let carInput = { gas: 0, steer: 0 };
-    document.getElementById('btn-car-forward').addEventListener('touchstart', (e) => { e.preventDefault(); carInput.gas = 1.2; }); // faster car
+    document.getElementById('btn-car-forward').addEventListener('touchstart', (e) => { e.preventDefault(); carInput.gas = 1.2; });
     document.getElementById('btn-car-forward').addEventListener('touchend', () => carInput.gas = 0);
     document.getElementById('btn-car-backward').addEventListener('touchstart', (e) => { e.preventDefault(); carInput.gas = -0.6; });
     document.getElementById('btn-car-backward').addEventListener('touchend', () => carInput.gas = 0);
@@ -526,7 +602,7 @@
     document.getElementById('btn-close-fullmap').addEventListener('click', () => fullMapModal.style.display = 'none');
     document.getElementById('btn-exit').addEventListener('click', () => backToLobby());
 
-    // --- RADAR MAP ---
+    // Radar Map
     const miniCanvas = document.getElementById('minimap-canvas'); const miniCtx = miniCanvas.getContext('2d');
     function drawRadarMap(ctx, w, h, scale) {
       ctx.clearRect(0, 0, w, h); const cx = w/2, cy = h/2;
@@ -547,7 +623,7 @@
       drawRadarMap(canvas.getContext('2d'), canvas.width, canvas.height, 0.7);
     }
 
-    // --- GAME FLOW ---
+    // Game Flow
     document.getElementById('btn-start-game').addEventListener('click', () => {
       isGameStarted = true;
       document.getElementById('lobby-screen').style.display = 'none';
@@ -585,7 +661,7 @@
     function restartGame() { location.reload(); }
     function backToLobby() { location.reload(); }
 
-    // --- MAIN LOOP ---
+    // --- MAIN GAME LOOP ---
     let footstepTimer = 0;
     function animate() {
       requestAnimationFrame(animate);
@@ -595,16 +671,27 @@
         camera.position.z = characterGroup.position.z + 5;
         camera.position.y = 2.5; camera.lookAt(characterGroup.position);
       } else {
-        // Smooth camera lerp
-        cameraAngleYaw += (targetYaw - cameraAngleYaw) * 0.12;
-        cameraAnglePitch += (targetPitch - cameraAnglePitch) * 0.12;
+        // Smooth camera rotation interpolation
+        cameraAngleYaw += (targetYaw - cameraAngleYaw) * 0.15;
+        cameraAnglePitch += (targetPitch - cameraAnglePitch) * 0.15;
 
-        // Vehicle proximity
+        // Gravity and Jump physics
+        if(!player.grounded) {
+          characterGroup.position.y += player.yVelocity;
+          player.yVelocity -= 0.018; // gravity
+          if(characterGroup.position.y <= 0) {
+            characterGroup.position.y = 0;
+            player.grounded = true;
+            player.yVelocity = 0;
+          }
+        }
+
+        // Vehicle proximity check
         let nearVeh = false;
         vehicles.forEach(v => { if(characterGroup.position.distanceTo(v.position) < 5) nearVeh = true; });
         btnVeh.style.display = (nearVeh || activeVehicle) ? 'flex' : 'none';
 
-        // Vehicle physics - faster
+        // Vehicle physics
         if(activeVehicle) {
           activeVehicle.userData.speed = carInput.gas;
           activeVehicle.rotation.y += carInput.steer;
@@ -616,7 +703,6 @@
           }
           characterGroup.position.copy(activeVehicle.position);
 
-          // Crush zombies with car
           for(let j = zombies.length - 1; j >= 0; j--) {
             if(activeVehicle.position.distanceTo(zombies[j].position) < 2.5) {
               scene.remove(zombies[j]); zombies.splice(j, 1);
@@ -626,7 +712,7 @@
             }
           }
         } else {
-          // Character movement - faster and smoother
+          // Character movement based on Joystick & Camera Direction
           if(Math.abs(joystickInput.x) > 0.05 || Math.abs(joystickInput.y) > 0.05) {
             const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
             const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
@@ -636,7 +722,8 @@
             const nextZ = characterGroup.position.z + moveDir.z * player.speed;
 
             if(!checkCollision(nextX, nextZ, 0.8)) {
-              characterGroup.position.x = nextX; characterGroup.position.z = nextZ;
+              characterGroup.position.x = nextX; 
+              characterGroup.position.z = nextZ;
             }
             characterGroup.rotation.y = Math.atan2(moveDir.x, moveDir.z);
 
@@ -644,7 +731,7 @@
           }
         }
 
-        // Loot Collection (orange circles)
+        // Loot Collection
         for(let i = lootCrates.length - 1; i >= 0; i--) {
           if(characterGroup.position.distanceTo(lootCrates[i].position) < 2.0) {
             scene.remove(lootCrates[i]); lootCrates.splice(i, 1);
@@ -652,7 +739,7 @@
           }
         }
 
-        // Bullets & Zombie damage
+        // Bullets & Zombie collision handling
         for(let i = bullets.length - 1; i >= 0; i--) {
           const b = bullets[i]; b.position.add(b.velocity);
           let bulletUsed = false;
@@ -665,22 +752,11 @@
               AudioEngine.playHit();
 
               if(z.userData.hp <= 0) {
-                // zombie death animation: scale down and remove
                 AudioEngine.playZombieDie();
-                // simple scale-down effect
-                let scale = 1;
-                const interval = setInterval(() => {
-                  scale -= 0.1;
-                  if(scale <= 0) {
-                    clearInterval(interval);
-                    scene.remove(z);
-                    zombies.splice(j, 1);
-                    player.kills++; zombiesRemaining--; updateHUD();
-                    if(zombiesRemaining > 0) spawnZombie(); else showVictory();
-                  } else {
-                    z.scale.set(scale, scale, scale);
-                  }
-                }, 30);
+                scene.remove(z);
+                zombies.splice(j, 1);
+                player.kills++; zombiesRemaining--; updateHUD();
+                if(zombiesRemaining > 0) spawnZombie(); else showVictory();
               }
               break;
             }
@@ -690,7 +766,7 @@
           }
         }
 
-        // Zombie AI - faster
+        // Zombie AI Pursuit
         const targetPos = activeVehicle ? activeVehicle.position : characterGroup.position;
         zombies.forEach(z => {
           const dir = new THREE.Vector3().subVectors(targetPos, z.position).normalize();
@@ -710,27 +786,31 @@
           }
         });
 
-        // Third Person Camera - keep character slightly left of center, crosshair fixed on screen center
+        // --- CAMERA OVER-THE-SHOULDER ALIGNMENT (Aim Center Fix) ---
         const activeObj = activeVehicle || characterGroup;
-        const camDist = activeVehicle ? 8.5 : 5.5; 
-        const camHeight = activeVehicle ? 3.5 : 2.2;
-        // Use smooth yaw/pitch for camera
-        const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
-        const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
+        const camDist = activeVehicle ? 8.5 : 4.8; 
+        const camHeight = activeVehicle ? 3.5 : (player.mode === 'lie' ? 1.0 : (player.mode === 'sit' ? 1.6 : 2.2));
         
-        // Camera position: behind and above, with slight offset to keep character left of center
-        const offset = new THREE.Vector3(0, 0, 0);
-        // Add a small right offset so character is not dead center, crosshair remains center
-        offset.addScaledVector(right, -1.2); 
-        offset.addScaledVector(new THREE.Vector3(0, 1, 0), Math.sin(cameraAnglePitch) * 1.5);
+        // Base Direction Vectors
+        const forwardDir = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
+        const rightDir = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
+
+        // Shoulder offset shifts character slightly to left of frame so center screen aim crosshair aligns properly
+        const shoulderOffset = activeVehicle ? 0 : 0.85;
+
+        const targetCamX = activeObj.position.x - forwardDir.x * camDist + rightDir.x * shoulderOffset;
+        const targetCamY = activeObj.position.y + camHeight + Math.sin(cameraAnglePitch) * 2.2;
+        const targetCamZ = activeObj.position.z - forwardDir.z * camDist + rightDir.z * shoulderOffset;
+
+        camera.position.set(targetCamX, targetCamY, targetCamZ);
+
+        // Target point for camera to look at (center of screen aim)
+        const lookTarget = new THREE.Vector3()
+          .copy(activeObj.position)
+          .add(rightDir.clone().multiplyScalar(shoulderOffset))
+          .add(new THREE.Vector3(0, player.mode === 'lie' ? 0.4 : 1.3, 0));
         
-        const camPos = new THREE.Vector3().copy(activeObj.position)
-          .addScaledVector(forward, -camDist)
-          .add(new THREE.Vector3(0, camHeight, 0))
-          .add(offset);
-        
-        camera.position.lerp(camPos, 0.15);
-        camera.lookAt(activeObj.position.x, activeObj.position.y + 1.2, activeObj.position.z);
+        camera.lookAt(lookTarget);
 
         drawRadarMap(miniCtx, 90, 90, 0.8);
       }
