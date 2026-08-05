@@ -9,19 +9,28 @@
     html, body { width: 100%; height: 100%; overflow: hidden; background: #0b0e14; font-family: 'Segoe UI', system-ui, sans-serif; }
     #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
     
-    /* Center Screen Crosshair - Fixed in center screen */
-    #crosshair { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; pointer-events: none; z-index: 999; }
+    /* Dynamic Character-Attached Aim Reticle */
+    #crosshair { display: none; position: absolute; width: 20px; height: 20px; pointer-events: none; z-index: 999; transform: translate(-50%, -50%); }
     #crosshair::before, #crosshair::after { content: ''; position: absolute; background: rgba(255, 255, 255, 0.9); box-shadow: 0 0 4px #000; }
-    #crosshair::before { top: 11px; left: 0; width: 24px; height: 2px; }
-    #crosshair::after { top: 0; left: 11px; width: 2px; height: 24px; }
-    #crosshair-dot { position: absolute; top: 10px; left: 10px; width: 4px; height: 4px; background: #ef4444; border-radius: 50%; }
+    #crosshair::before { top: 9px; left: 0; width: 20px; height: 2px; }
+    #crosshair::after { top: 0; left: 9px; width: 2px; height: 20px; }
+    #crosshair-dot { position: absolute; top: 8px; left: 8px; width: 4px; height: 4px; background: #ef4444; border-radius: 50%; }
 
     #ui-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
     
     /* Left Top HUD */
-    #top-left-hud { position: absolute; top: 15px; left: 20px; display: flex; gap: 12px; z-index: 30; pointer-events: auto; }
-    .hud-card { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; padding: 8px 16px; display: flex; align-items: center; gap: 8px; color: #fff; font-size: 14px; font-weight: bold; backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-    .hud-card span { color: #38bdf8; font-size: 16px; }
+    #top-left-hud { position: absolute; top: 15px; left: 20px; display: flex; gap: 10px; z-index: 30; pointer-events: auto; align-items: center; }
+    .hud-card { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; padding: 6px 12px; display: flex; align-items: center; gap: 6px; color: #fff; font-size: 13px; font-weight: bold; backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+    .hud-card span { color: #38bdf8; font-size: 15px; }
+
+    /* Left Map and Exit Container */
+    #left-map-container { display: none; position: absolute; top: 65px; left: 20px; flex-direction: column; gap: 8px; z-index: 30; pointer-events: auto; align-items: flex-start; }
+    #minimap-container { width: 85px; height: 85px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8); overflow: hidden; background: rgba(15,23,42,0.85); box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; }
+    #minimap-canvas { width: 100%; height: 100%; }
+    
+    /* Small Corner Exit Button */
+    #btn-exit { width: 28px; height: 28px; background: rgba(220, 38, 38, 0.85); border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(6px); color: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+    #btn-exit:active { transform: scale(0.9); }
 
     /* Joystick */
     #joystick-container { position: absolute; bottom: 35px; left: 40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.25); border-radius: 50%; backdrop-filter: blur(6px); pointer-events: auto; touch-action: none; }
@@ -56,12 +65,6 @@
     #lobby-screen { position: absolute; top:0; left:0; width:100%; height:100%; z-index:50; display:flex; flex-direction:column; justify-content:space-between; padding:30px; pointer-events:auto; background: linear-gradient(180deg, rgba(15,23,42,0.7) 0%, rgba(0,0,0,0.3) 50%, rgba(15,23,42,0.9) 100%); }
     .lobby-title { color: #38bdf8; font-size: 32px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 16px rgba(56,189,248,0.6); }
     .btn-start { position: absolute; bottom: 40px; right: 40px; padding: 16px 42px; background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; font-size: 18px; font-weight: 800; border: 2px solid #86efac; border-radius: 12px; cursor: pointer; box-shadow: 0 6px 20px rgba(34,197,94,0.4); letter-spacing: 1px; }
-
-    /* Top Right Controls */
-    #top-right-controls { display: none; position: absolute; top: 15px; right: 20px; align-items: center; gap: 8px; z-index: 30; pointer-events: auto; flex-direction: column; }
-    #minimap-container { width: 90px; height: 90px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8); overflow: hidden; background: rgba(15,23,42,0.85); box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; }
-    #minimap-canvas { width: 100%; height: 100%; }
-    .btn-icon-hud { width: 36px; height: 36px; background: rgba(15,23,42,0.85); border: 1px solid rgba(255,255,255,0.3); border-radius: 10px; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(6px); color: #fff; margin-bottom: 4px; }
 
     /* Tactical Full Map Modal */
     #fullmap-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 80vw; height: 80vh; background: rgba(15,23,42,0.95); border: 2px solid #38bdf8; border-radius: 16px; z-index: 200; pointer-events: auto; padding: 16px; flex-direction: column; backdrop-filter: blur(12px); box-shadow: 0 0 30px rgba(0,0,0,0.8); }
@@ -123,12 +126,12 @@
     </div>
   </div>
 
-  <!-- Top Right Controls -->
-  <div id="top-right-controls">
-    <div id="btn-exit" class="btn-icon-hud" title="Exit to Lobby">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+  <!-- Left Map & Exit Controls -->
+  <div id="left-map-container">
+    <div id="btn-exit" title="Exit to Lobby">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
     </div>
-    <div id="minimap-container"><canvas id="minimap-canvas" width="90" height="90"></canvas></div>
+    <div id="minimap-container"><canvas id="minimap-canvas" width="85" height="85"></canvas></div>
   </div>
 
   <!-- Full Map Modal -->
@@ -253,6 +256,13 @@
         gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
         osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.1);
       },
+      playHeal() {
+        this.init(); const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+        osc.type = 'sine'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(600, now + 0.2);
+        gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.2);
+      },
       playZombieDie() {
         this.init(); const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
@@ -312,8 +322,10 @@
     const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(16, worldSize), roadMat);
     mainRoad.rotation.x = -Math.PI / 2; mainRoad.position.y = 0.02; scene.add(mainRoad);
 
-    // Loot Crates
+    // Ammo Crates & Health Packs
     const lootCrates = [];
+    const healthPacks = [];
+
     function spawnLootCrate(x, z) {
       const group = new THREE.Group();
       const ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.9, 24), new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xf97316, emissiveIntensity: 0.3, side: THREE.DoubleSide }));
@@ -323,6 +335,19 @@
       group.position.set(x, 0, z); scene.add(group);
       lootCrates.push(group);
     }
+
+    function spawnHealthPack(x, z) {
+      const group = new THREE.Group();
+      const box = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.6), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+      box.position.y = 0.5; group.add(box);
+      const crossHorizontal = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.42, 0.12), new THREE.MeshStandardMaterial({ color: 0xef4444 }));
+      crossHorizontal.position.y = 0.51; group.add(crossHorizontal);
+      const crossVertical = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.42, 0.4), new THREE.MeshStandardMaterial({ color: 0xef4444 }));
+      crossVertical.position.y = 0.51; group.add(crossVertical);
+      group.position.set(x, 0, z); scene.add(group);
+      healthPacks.push(group);
+    }
+
     for(let i = 0; i < 35; i++) {
       spawnLootCrate((Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500);
     }
@@ -353,6 +378,11 @@
     head.position.y = 2.25; bodyMeshGroup.add(head);
     const gunMesh = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.85), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
     gunMesh.position.set(0.38, 1.35, -0.4); bodyMeshGroup.add(gunMesh);
+
+    // Target Aim Mesh for dynamic shoulder reticle
+    const aimPointMesh = new THREE.Object3D();
+    aimPointMesh.position.set(0.38, 1.35, -12); // Direct zombie chest height level forward
+    bodyMeshGroup.add(aimPointMesh);
 
     // Player State
     const player = {
@@ -401,8 +431,8 @@
     for(let i = 0; i < 12; i++) spawnZombie();
 
     // --- SMOOTH CAMERA & TOUCH SWIPE CONTROLS ---
-    let targetYaw = 0, targetPitch = 0.15;
-    let cameraAngleYaw = 0, cameraAnglePitch = 0.15;
+    let targetYaw = 0, targetPitch = 0.05;
+    let cameraAngleYaw = 0, cameraAnglePitch = 0.05;
     let isSwiping = false, activeTouchId = null, lastTX = 0, lastTY = 0;
 
     window.addEventListener('touchstart', (e) => {
@@ -424,7 +454,7 @@
           const dx = t.clientX - lastTX;
           const dy = t.clientY - lastTY;
           
-          targetYaw -= dx * 0.004; // Smooth sensitivity
+          targetYaw -= dx * 0.004;
           targetPitch -= dy * 0.003;
           targetPitch = Math.max(-0.25, Math.min(Math.PI / 3, targetPitch));
           
@@ -477,14 +507,10 @@
 
       const b = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0xfacc15 }));
       
-      // Calculate origin point based on current character height
-      let heightOffset = 1.4;
-      if (player.mode === 'sit') heightOffset = 0.8;
-      if (player.mode === 'lie') heightOffset = 0.3;
+      let gunWorldPos = new THREE.Vector3();
+      gunMesh.getWorldPosition(gunWorldPos);
+      b.position.copy(gunWorldPos);
       
-      b.position.set(characterGroup.position.x, characterGroup.position.y + heightOffset, characterGroup.position.z);
-      
-      // Raycast shooting direction straight towards center aim point
       const dir = new THREE.Vector3(); 
       camera.getWorldDirection(dir);
       b.velocity = dir.multiplyScalar(3.2); 
@@ -494,7 +520,7 @@
     // --- BUTTON EVENT LISTENERS ---
     document.getElementById('btn-fire').addEventListener('touchstart', (e) => { e.preventDefault(); shoot(); });
     
-    // Jump Button Functionality
+    // Jump Button
     document.getElementById('btn-jump').addEventListener('touchstart', (e) => { 
       e.preventDefault(); 
       if(player.grounded) { 
@@ -505,21 +531,21 @@
       } 
     });
 
-    // Sit Button Functionality
+    // Sit Button
     document.getElementById('btn-sit').addEventListener('touchstart', (e) => { 
       e.preventDefault(); 
       player.mode = (player.mode === 'sit') ? 'stand' : 'sit';
       updateCharacterPose();
     });
 
-    // Lie Button Functionality
+    // Lie Button (Prone Fix)
     document.getElementById('btn-lie').addEventListener('touchstart', (e) => { 
       e.preventDefault(); 
       player.mode = (player.mode === 'lie') ? 'stand' : 'lie';
       updateCharacterPose();
     });
 
-    // Magazine Reload Button Functionality
+    // Magazine Reload Button
     document.getElementById('btn-reload').addEventListener('touchstart', (e) => {
       e.preventDefault();
       const needed = player.maxClip - player.ammo;
@@ -538,12 +564,12 @@
       if (player.mode === 'sit') {
         bodyMeshGroup.scale.set(1, 0.65, 1);
         bodyMeshGroup.rotation.x = 0;
-        bodyMeshGroup.position.y = -0.3;
+        bodyMeshGroup.position.y = 0;
         player.speed = 0.35;
       } else if (player.mode === 'lie') {
         bodyMeshGroup.scale.set(1, 1, 1);
-        bodyMeshGroup.rotation.x = -Math.PI / 2.3;
-        bodyMeshGroup.position.y = -0.7;
+        bodyMeshGroup.rotation.x = -Math.PI / 2.2;
+        bodyMeshGroup.position.y = 0.35; // Kept character clear off ground to avoid sinking
         player.speed = 0.2;
       } else { // Stand
         bodyMeshGroup.scale.set(1, 1, 1);
@@ -629,7 +655,7 @@
       document.getElementById('lobby-screen').style.display = 'none';
       document.getElementById('ui-layer').style.display = 'block';
       document.getElementById('top-left-hud').style.display = 'flex';
-      document.getElementById('top-right-controls').style.display = 'flex';
+      document.getElementById('left-map-container').style.display = 'flex';
       document.getElementById('crosshair').style.display = 'block';
       updateHUD();
     });
@@ -663,6 +689,8 @@
 
     // --- MAIN GAME LOOP ---
     let footstepTimer = 0;
+    const tempProjVec = new THREE.Vector3();
+
     function animate() {
       requestAnimationFrame(animate);
 
@@ -671,14 +699,13 @@
         camera.position.z = characterGroup.position.z + 5;
         camera.position.y = 2.5; camera.lookAt(characterGroup.position);
       } else {
-        // Smooth camera rotation interpolation
         cameraAngleYaw += (targetYaw - cameraAngleYaw) * 0.15;
         cameraAnglePitch += (targetPitch - cameraAnglePitch) * 0.15;
 
         // Gravity and Jump physics
         if(!player.grounded) {
           characterGroup.position.y += player.yVelocity;
-          player.yVelocity -= 0.018; // gravity
+          player.yVelocity -= 0.018;
           if(characterGroup.position.y <= 0) {
             characterGroup.position.y = 0;
             player.grounded = true;
@@ -705,6 +732,7 @@
 
           for(let j = zombies.length - 1; j >= 0; j--) {
             if(activeVehicle.position.distanceTo(zombies[j].position) < 2.5) {
+              spawnHealthPack(zombies[j].position.x, zombies[j].position.z);
               scene.remove(zombies[j]); zombies.splice(j, 1);
               player.kills++; zombiesRemaining--; updateHUD();
               AudioEngine.playZombieDie();
@@ -728,14 +756,25 @@
             characterGroup.rotation.y = Math.atan2(moveDir.x, moveDir.z);
 
             footstepTimer += 0.05; if(footstepTimer > 0.2) { footstepTimer = 0; AudioEngine.playFootstep(); }
+          } else {
+            characterGroup.rotation.y = cameraAngleYaw;
           }
         }
 
-        // Loot Collection
+        // Loot & Health Collection
         for(let i = lootCrates.length - 1; i >= 0; i--) {
           if(characterGroup.position.distanceTo(lootCrates[i].position) < 2.0) {
             scene.remove(lootCrates[i]); lootCrates.splice(i, 1);
             player.reserveAmmo += 40; updateHUD(); AudioEngine.playPickup();
+          }
+        }
+
+        for(let i = healthPacks.length - 1; i >= 0; i--) {
+          if(characterGroup.position.distanceTo(healthPacks[i].position) < 2.0) {
+            scene.remove(healthPacks[i]); healthPacks.splice(i, 1);
+            player.hp = Math.min(100, player.hp + 35);
+            document.getElementById('hp-bar').style.width = player.hp + '%';
+            AudioEngine.playHeal();
           }
         }
 
@@ -753,6 +792,7 @@
 
               if(z.userData.hp <= 0) {
                 AudioEngine.playZombieDie();
+                spawnHealthPack(z.position.x, z.position.z);
                 scene.remove(z);
                 zombies.splice(j, 1);
                 player.kills++; zombiesRemaining--; updateHUD();
@@ -782,20 +822,24 @@
             player.hp = Math.max(0, player.hp - 0.6);
             document.getElementById('hp-bar').style.width = player.hp + '%';
             AudioEngine.playHit();
+
+            // Zombie drops health pack randomly while attacking
+            if(Math.random() < 0.02) {
+              spawnHealthPack(characterGroup.position.x + (Math.random()-0.5)*3, characterGroup.position.z + (Math.random()-0.5)*3);
+            }
+
             if(player.hp <= 0) showDefeat();
           }
         });
 
-        // --- CAMERA OVER-THE-SHOULDER ALIGNMENT (Aim Center Fix) ---
+        // --- CAMERA OVER-THE-SHOULDER ALIGNMENT ---
         const activeObj = activeVehicle || characterGroup;
         const camDist = activeVehicle ? 8.5 : 4.8; 
-        const camHeight = activeVehicle ? 3.5 : (player.mode === 'lie' ? 1.0 : (player.mode === 'sit' ? 1.6 : 2.2));
+        const camHeight = activeVehicle ? 3.5 : (player.mode === 'lie' ? 1.2 : (player.mode === 'sit' ? 1.6 : 2.2));
         
-        // Base Direction Vectors
         const forwardDir = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
         const rightDir = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
 
-        // Shoulder offset shifts character slightly to left of frame so center screen aim crosshair aligns properly
         const shoulderOffset = activeVehicle ? 0 : 0.85;
 
         const targetCamX = activeObj.position.x - forwardDir.x * camDist + rightDir.x * shoulderOffset;
@@ -804,7 +848,6 @@
 
         camera.position.set(targetCamX, targetCamY, targetCamZ);
 
-        // Target point for camera to look at (center of screen aim)
         const lookTarget = new THREE.Vector3()
           .copy(activeObj.position)
           .add(rightDir.clone().multiplyScalar(shoulderOffset))
@@ -812,7 +855,18 @@
         
         camera.lookAt(lookTarget);
 
-        drawRadarMap(miniCtx, 90, 90, 0.8);
+        // Update Dynamic Aim Icon Position
+        if(!activeVehicle) {
+          aimPointMesh.getWorldPosition(tempProjVec);
+          tempProjVec.project(camera);
+          const screenX = (tempProjVec.x * .5 + .5) * window.innerWidth;
+          const screenY = (-(tempProjVec.y * .5) + .5) * window.innerHeight;
+          const crosshairElem = document.getElementById('crosshair');
+          crosshairElem.style.left = `${screenX}px`;
+          crosshairElem.style.top = `${screenY}px`;
+        }
+
+        drawRadarMap(miniCtx, 85, 85, 0.8);
       }
 
       renderer.render(scene, camera);
