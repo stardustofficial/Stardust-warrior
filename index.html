@@ -9,8 +9,8 @@
     html, body { width: 100%; height: 100%; overflow: hidden; background: #0b0e14; font-family: 'Segoe UI', system-ui, sans-serif; }
     #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
     
-    /* Dynamic Character-Attached Aim Reticle */
-    #crosshair { display: none; position: absolute; width: 20px; height: 20px; pointer-events: none; z-index: 999; transform: translate(-50%, -50%); }
+    /* Screen Fixed Crosshair Reticle */
+    #crosshair { display: none; position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; pointer-events: none; z-index: 999; transform: translate(-50%, -50%); }
     #crosshair::before, #crosshair::after { content: ''; position: absolute; background: rgba(255, 255, 255, 0.9); box-shadow: 0 0 4px #000; }
     #crosshair::before { top: 9px; left: 0; width: 20px; height: 2px; }
     #crosshair::after { top: 0; left: 9px; width: 2px; height: 20px; }
@@ -18,18 +18,21 @@
 
     #ui-layer { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
     
-    /* Left Top HUD */
-    #top-left-hud { position: absolute; top: 15px; left: 20px; display: flex; gap: 10px; z-index: 30; pointer-events: auto; align-items: center; }
-    .hud-card { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; padding: 6px 12px; display: flex; align-items: center; gap: 6px; color: #fff; font-size: 13px; font-weight: bold; backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-    .hud-card span { color: #38bdf8; font-size: 15px; }
+    /* Right Top HUD Container */
+    #top-right-hud { display: none; position: absolute; top: 15px; right: 20px; z-index: 30; pointer-events: auto; align-items: flex-start; gap: 12px; }
+    
+    /* HUD Cards Layout */
+    .hud-card { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; padding: 5px 10px; display: flex; align-items: center; gap: 6px; color: #fff; font-size: 12px; font-weight: bold; backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+    .hud-card span { color: #38bdf8; font-size: 14px; }
 
-    /* Left Map and Exit Container */
-    #left-map-container { display: none; position: absolute; top: 65px; left: 20px; flex-direction: column; gap: 8px; z-index: 30; pointer-events: auto; align-items: flex-start; }
-    #minimap-container { width: 85px; height: 85px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8); overflow: hidden; background: rgba(15,23,42,0.85); box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; }
+    #hud-row-top { display: flex; gap: 8px; align-items: center; }
+    #hud-row-bottom { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+
+    #minimap-container { width: 80px; height: 80px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8); overflow: hidden; background: rgba(15,23,42,0.85); box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; }
     #minimap-canvas { width: 100%; height: 100%; }
     
-    /* Small Corner Exit Button */
-    #btn-exit { width: 28px; height: 28px; background: rgba(220, 38, 38, 0.85); border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(6px); color: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+    /* Exit Button on Right Top */
+    #btn-exit { width: 32px; height: 32px; background: rgba(220, 38, 38, 0.85); border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(6px); color: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
     #btn-exit:active { transform: scale(0.9); }
 
     /* Joystick */
@@ -111,27 +114,32 @@
     <button id="btn-start-game" class="btn-start">START GAME</button>
   </div>
 
-  <!-- Top Left HUD -->
-  <div id="top-left-hud">
-    <div class="hud-card">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      ALIVE: <span id="hud-alive">50</span>
+  <!-- Right Top Corner HUD (Map + Alive + Kill + Ammo + Exit) -->
+  <div id="top-right-hud">
+    <div id="minimap-container"><canvas id="minimap-canvas" width="80" height="80"></canvas></div>
+    
+    <div style="display: flex; flex-direction: column;">
+      <div id="hud-row-top">
+        <div class="hud-card">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          ALIVE: <span id="hud-alive">50</span>
+        </div>
+        <div class="hud-card">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+          KILLS: <span id="hud-kills">0</span>
+        </div>
+        <div id="btn-exit" title="Exit to Lobby">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        </div>
+      </div>
+      
+      <!-- Small Ammo Count Button below ALIVE -->
+      <div id="hud-row-bottom">
+        <div class="hud-card" style="padding: 4px 8px; font-size: 11px;">
+          AMMO: <span id="hud-ammo" style="color:#facc15; font-size: 13px;">30/120</span>
+        </div>
+      </div>
     </div>
-    <div class="hud-card">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
-      KILLS: <span id="hud-kills">0</span>
-    </div>
-    <div class="hud-card" style="font-size:12px;">
-      AMMO: <span id="hud-ammo" style="color:#facc15;">30/120</span>
-    </div>
-  </div>
-
-  <!-- Left Map & Exit Controls -->
-  <div id="left-map-container">
-    <div id="btn-exit" title="Exit to Lobby">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-    </div>
-    <div id="minimap-container"><canvas id="minimap-canvas" width="85" height="85"></canvas></div>
   </div>
 
   <!-- Full Map Modal -->
@@ -379,11 +387,6 @@
     const gunMesh = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.85), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
     gunMesh.position.set(0.38, 1.35, -0.4); bodyMeshGroup.add(gunMesh);
 
-    // Target Aim Mesh for dynamic shoulder reticle
-    const aimPointMesh = new THREE.Object3D();
-    aimPointMesh.position.set(0.38, 1.35, -12); // Direct zombie chest height level forward
-    bodyMeshGroup.add(aimPointMesh);
-
     // Player State
     const player = {
       hp: 100, kills: 0, ammo: 30, reserveAmmo: 120, maxClip: 30,
@@ -520,11 +523,11 @@
     // --- BUTTON EVENT LISTENERS ---
     document.getElementById('btn-fire').addEventListener('touchstart', (e) => { e.preventDefault(); shoot(); });
     
-    // Jump Button
+    // Jump Button - Accelerated Jump Speed
     document.getElementById('btn-jump').addEventListener('touchstart', (e) => { 
       e.preventDefault(); 
       if(player.grounded) { 
-        player.yVelocity = 0.28; 
+        player.yVelocity = 0.42; // Increased jump velocity for faster jump action
         player.grounded = false; 
         player.mode = 'stand';
         updateCharacterPose();
@@ -538,7 +541,7 @@
       updateCharacterPose();
     });
 
-    // Lie Button (Prone Fix)
+    // Lie Button
     document.getElementById('btn-lie').addEventListener('touchstart', (e) => { 
       e.preventDefault(); 
       player.mode = (player.mode === 'lie') ? 'stand' : 'lie';
@@ -569,7 +572,7 @@
       } else if (player.mode === 'lie') {
         bodyMeshGroup.scale.set(1, 1, 1);
         bodyMeshGroup.rotation.x = -Math.PI / 2.2;
-        bodyMeshGroup.position.y = 0.35; // Kept character clear off ground to avoid sinking
+        bodyMeshGroup.position.y = 0.35;
         player.speed = 0.2;
       } else { // Stand
         bodyMeshGroup.scale.set(1, 1, 1);
@@ -633,7 +636,7 @@
     function drawRadarMap(ctx, w, h, scale) {
       ctx.clearRect(0, 0, w, h); const cx = w/2, cy = h/2;
       ctx.fillStyle = '#2d5a27'; ctx.fillRect(0,0,w,h);
-      ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#ef4444';
       zombies.forEach(z => {
         const dx = (z.position.x - characterGroup.position.x) * scale;
@@ -654,8 +657,7 @@
       isGameStarted = true;
       document.getElementById('lobby-screen').style.display = 'none';
       document.getElementById('ui-layer').style.display = 'block';
-      document.getElementById('top-left-hud').style.display = 'flex';
-      document.getElementById('left-map-container').style.display = 'flex';
+      document.getElementById('top-right-hud').style.display = 'flex';
       document.getElementById('crosshair').style.display = 'block';
       updateHUD();
     });
@@ -689,7 +691,6 @@
 
     // --- MAIN GAME LOOP ---
     let footstepTimer = 0;
-    const tempProjVec = new THREE.Vector3();
 
     function animate() {
       requestAnimationFrame(animate);
@@ -702,10 +703,10 @@
         cameraAngleYaw += (targetYaw - cameraAngleYaw) * 0.15;
         cameraAnglePitch += (targetPitch - cameraAnglePitch) * 0.15;
 
-        // Gravity and Jump physics
+        // Gravity and Jump physics (Faster Jump Speed)
         if(!player.grounded) {
           characterGroup.position.y += player.yVelocity;
-          player.yVelocity -= 0.018;
+          player.yVelocity -= 0.032; // Increased gravity for faster snappy jump
           if(characterGroup.position.y <= 0) {
             characterGroup.position.y = 0;
             player.grounded = true;
@@ -823,7 +824,6 @@
             document.getElementById('hp-bar').style.width = player.hp + '%';
             AudioEngine.playHit();
 
-            // Zombie drops health pack randomly while attacking
             if(Math.random() < 0.02) {
               spawnHealthPack(characterGroup.position.x + (Math.random()-0.5)*3, characterGroup.position.z + (Math.random()-0.5)*3);
             }
@@ -855,18 +855,7 @@
         
         camera.lookAt(lookTarget);
 
-        // Update Dynamic Aim Icon Position
-        if(!activeVehicle) {
-          aimPointMesh.getWorldPosition(tempProjVec);
-          tempProjVec.project(camera);
-          const screenX = (tempProjVec.x * .5 + .5) * window.innerWidth;
-          const screenY = (-(tempProjVec.y * .5) + .5) * window.innerHeight;
-          const crosshairElem = document.getElementById('crosshair');
-          crosshairElem.style.left = `${screenX}px`;
-          crosshairElem.style.top = `${screenY}px`;
-        }
-
-        drawRadarMap(miniCtx, 85, 85, 0.8);
+        drawRadarMap(miniCtx, 80, 80, 0.8);
       }
 
       renderer.render(scene, camera);
