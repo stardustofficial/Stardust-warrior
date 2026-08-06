@@ -111,8 +111,22 @@
     #top-left-hud .hud-card .hud-icon { margin-right: 2px; }
     #top-left-hud .hud-card span { color: #38bdf8; font-weight: 700; }
 
-    /* Arena Mode specific - overlay if needed */
-    #arena-container { display: none; position: absolute; top:0; left:0; width:100%; height:100%; z-index:5; }
+    /* Arena mode specific - overlay container */
+    #arena-container { display: none; position: absolute; top:0; left:0; width:100%; height:100%; z-index:5; pointer-events: none; }
+    #arena-container > * { pointer-events: auto; }
+    
+    /* Arena UI elements - styled to match the given code */
+    .arena-stat-panel { position: absolute; top: 170px; left: 15px; background: rgba(0,0,0,0.65); padding: 10px 15px; border-radius: 8px; border-left: 4px solid #ff4444; color: white; font-size: 14px; font-weight: bold; display: flex; flex-direction: column; gap: 6px; z-index: 10; }
+    .arena-stat-item { display: flex; align-items: center; gap: 8px; }
+    .arena-stat-value { color: #ffeb3b; }
+    .arena-aim-reticle { position: absolute; width: 20px; height: 20px; border: 2px solid rgba(255,50,50,0.8); border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%); z-index: 8; box-shadow: 0 0 4px #ff0000; }
+    .arena-aim-reticle::after { content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: #ff0000; border-radius: 50%; transform: translate(-50%, -50%); }
+    .arena-health-container { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 200px; height: 16px; background: rgba(0,0,0,0.6); border: 2px solid #fff; border-radius: 10px; overflow: hidden; z-index: 10; }
+    .arena-health-bar { width: 100%; height: 100%; background: #4CAF50; transition: width 0.2s; }
+    .arena-fire-btn { position: absolute; bottom: 30px; right: 30px; width: 80px; height: 80px; background: rgba(255,50,50,0.4); border: 2px solid rgba(255,100,100,0.8); border-radius: 50%; color: white; font-weight: bold; font-size: 18px; z-index: 10; touch-action: manipulation; }
+    .arena-reload-btn { position: absolute; bottom: 120px; right: 40px; width: 55px; height: 55px; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); border-radius: 50%; color: white; font-weight: bold; font-size: 12px; z-index: 10; touch-action: manipulation; }
+    .arena-joystick-zone { position: absolute; bottom: 30px; left: 30px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; z-index: 10; }
+    .arena-joystick-knob { position: absolute; top: 35px; left: 35px; width: 50px; height: 50px; background: rgba(255,255,255,0.4); border-radius: 50%; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -234,9 +248,9 @@
     </div>
   </div>
 
-  <!-- ARENA MODE UI (Overlay) -->
+  <!-- ARENA MODE UI CONTAINER -->
   <div id="arena-container">
-    <!-- Arena specific elements injected via JS -->
+    <!-- Elements will be injected by JavaScript -->
   </div>
 
   <!-- Car Control UI -->
@@ -289,10 +303,9 @@
     // ============================================================
     // GLOBAL STATE & MODE MANAGEMENT
     // ============================================================
-    let currentMode = 'battle-royale'; // 'battle-royale' or 'arena'
+    let currentMode = 'battle-royale';
     let isGameStarted = false;
 
-    // References to core UI elements
     const lobbyScreen = document.getElementById('lobby-screen');
     const modeSelectOverlay = document.getElementById('mode-select-overlay');
     const btnStartGame = document.getElementById('btn-start-game');
@@ -301,50 +314,38 @@
     const crosshair = document.getElementById('crosshair');
     const uiLayer = document.getElementById('ui-layer');
     const exitBtn = document.getElementById('btn-exit');
+    const arenaContainer = document.getElementById('arena-container');
 
-    // --- MODE SELECTION LOGIC ---
     // Show mode selection when START is clicked
     btnStartGame.addEventListener('click', () => {
       modeSelectOverlay.classList.add('active');
     });
 
-    // Back to lobby from mode select
     btnBackLobby.addEventListener('click', () => {
       modeSelectOverlay.classList.remove('active');
     });
 
-    // Mode card click handlers
     document.querySelectorAll('.mode-card').forEach(card => {
       card.addEventListener('click', () => {
         const mode = card.dataset.mode;
         currentMode = mode;
         modeSelectOverlay.classList.remove('active');
-        // Start the game with selected mode
         initGame();
       });
     });
 
-    // Exit button goes back to lobby (clears game state)
     exitBtn.addEventListener('click', backToLobby);
 
     function backToLobby() {
-      // Reset everything
       isGameStarted = false;
       document.querySelectorAll('.game-modal').forEach(m => m.style.display = 'none');
       lobbyScreen.style.display = 'flex';
       topLeftHud.style.display = 'none';
       crosshair.style.display = 'none';
       uiLayer.style.display = 'none';
-      document.getElementById('arena-container').style.display = 'none';
-      // Clean up arena if active
+      arenaContainer.style.display = 'none';
       if (window.arenaCleanup) window.arenaCleanup();
-      // Reset BR game if needed
       if (window.brCleanup) window.brCleanup();
-      // Show exit button always
-      exitBtn.style.display = 'flex';
-      // Reload to fully clean state? simpler: location.reload()
-      // But we want to keep mode selection, so we just hide everything.
-      // Actually, for clean slate we reload.
       location.reload();
     }
 
@@ -353,7 +354,57 @@
     }
 
     // ============================================================
-    // BATTLE ROYALE MODE (Existing Game)
+    // AUDIO ENGINE (shared)
+    // ============================================================
+    const AudioEngine = {
+      ctx: null,
+      init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); if(this.ctx.state === 'suspended') this.ctx.resume(); },
+      playGunshot() {
+        this.init(); const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(10, now + 0.15);
+        gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.15);
+      },
+      playFootstep() {
+        this.init(); const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+        osc.type = 'sine'; osc.frequency.setValueAtTime(80, now); osc.frequency.exponentialRampToValueAtTime(30, now + 0.05);
+        gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.05);
+      },
+      playPickup() {
+        this.init(); const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+        osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+        gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.1);
+      },
+      playHeal() {
+        this.init(); const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+        osc.type = 'sine'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(600, now + 0.2);
+        gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.2);
+      },
+      playZombieDie() {
+        this.init(); const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+        gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.3);
+      },
+      playHit() {
+        this.init(); const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+        osc.type = 'square'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(50, now + 0.1);
+        gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.1);
+      }
+    };
+
+    // ============================================================
+    // BATTLE ROYALE MODE
     // ============================================================
     let brInitialized = false;
     let brScene, brCamera, brRenderer;
@@ -363,7 +414,6 @@
     let brActiveVehicle = null;
     let brPlayer = { hp: 100, kills: 0, ammo: 30, reserveAmmo: 120, maxClip: 30, speed: 0.9, yVelocity: 0, grounded: true, mode: 'stand' };
     let brZombiesRemaining = 50;
-    const BR_TOTAL_ZOMBIES = 50;
     let brTargetYaw = 0, brTargetPitch = 0.05;
     let brCameraAngleYaw = 0, brCameraAnglePitch = 0.05;
     let brJoystickInput = { x: 0, y: 0 };
@@ -377,7 +427,6 @@
       if (brInitialized) return;
       brInitialized = true;
 
-      // Setup Three.js
       const container = document.getElementById('canvas-container');
       brScene = new THREE.Scene();
       brScene.background = new THREE.Color(0x38bdf8);
@@ -388,21 +437,18 @@
       brRenderer.shadowMap.enabled = true;
       container.appendChild(brRenderer.domElement);
 
-      // Lights
       brScene.add(new THREE.AmbientLight(0xffffff, 0.7));
       const sunLight = new THREE.DirectionalLight(0xfffbe1, 1.2);
       sunLight.position.set(100, 150, 50);
       sunLight.castShadow = true;
       brScene.add(sunLight);
 
-      // World
       const worldSize = 800;
       const ground = new THREE.Mesh(new THREE.PlaneGeometry(worldSize, worldSize), new THREE.MeshStandardMaterial({ color: 0x2d5a27, roughness: 0.9 }));
       ground.rotation.x = -Math.PI / 2;
       ground.receiveShadow = true;
       brScene.add(ground);
 
-      // Mountains
       for(let i = 0; i < 25; i++) {
         const h = 30 + Math.random() * 40; const r = 18 + Math.random() * 20;
         const m = new THREE.Mesh(new THREE.ConeGeometry(r, h, 6), new THREE.MeshStandardMaterial({ color: 0x525252, roughness: 0.8 }));
@@ -411,7 +457,6 @@
         brObstacleColliders.push({ type: 'cylinder', x: x, z: z, radius: r * 0.75 });
       }
 
-      // Trees
       for(let i = 0; i < 140; i++) {
         const tree = new THREE.Group();
         const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.7, 3.5), new THREE.MeshStandardMaterial({ color: 0x543d2b }));
@@ -423,12 +468,10 @@
         brObstacleColliders.push({ type: 'cylinder', x: x, z: z, radius: 1.2 });
       }
 
-      // Roads
       const roadMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6 });
       const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(16, worldSize), roadMat);
       mainRoad.rotation.x = -Math.PI / 2; mainRoad.position.y = 0.02; brScene.add(mainRoad);
 
-      // Loot Crates & Health Packs
       function spawnLootCrate(x, z) {
         const group = new THREE.Group();
         const ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.9, 24), new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xf97316, emissiveIntensity: 0.3, side: THREE.DoubleSide }));
@@ -455,7 +498,6 @@
         spawnLootCrate((Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500);
       }
 
-      // Vehicles
       function createVehicle(x, z, color) {
         const g = new THREE.Group();
         const body = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.2, 4.5), new THREE.MeshStandardMaterial({ color: color || 0xd97706 }));
@@ -469,7 +511,6 @@
       createVehicle(12, 15, 0xd97706);
       createVehicle(-40, -50, 0x2563eb);
 
-      // Player
       brCharacterGroup = new THREE.Group(); brScene.add(brCharacterGroup);
       brBodyMeshGroup = new THREE.Group(); brCharacterGroup.add(brBodyMeshGroup);
       const torso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), new THREE.MeshStandardMaterial({ color: 0x0284c7 }));
@@ -479,7 +520,6 @@
       brGunMesh = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.85), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
       brGunMesh.position.set(0.38, 1.35, -0.4); brBodyMeshGroup.add(brGunMesh);
 
-      // Zombies
       function createHealthBarCanvas() {
         const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 12;
         const ctx = canvas.getContext('2d');
@@ -513,8 +553,7 @@
       }
       for(let i = 0; i < 12; i++) spawnZombie();
 
-      // ===== Controls Setup =====
-      // Touch swipes for camera
+      // Controls setup
       window.addEventListener('touchstart', (e) => {
         if(!isGameStarted || currentMode !== 'battle-royale') return;
         for(let t of e.changedTouches) {
@@ -551,7 +590,6 @@
         }
       });
 
-      // Joystick
       const joyCont = document.getElementById('joystick-container');
       const joyKnob = document.getElementById('joystick-knob');
 
@@ -574,7 +612,6 @@
         brJoystickInput = { x: 0, y: 0 };
       });
 
-      // Shooting
       function shoot() {
         if(!isGameStarted || currentMode !== 'battle-royale' || brActiveVehicle || brPlayer.ammo <= 0) return;
         brPlayer.ammo--; updateBRHUD();
@@ -647,7 +684,6 @@
         }
       }
 
-      // Vehicle boarding
       const btnVeh = document.getElementById('btn-vehicle-enter');
       btnVeh.addEventListener('touchstart', (e) => {
         e.preventDefault();
@@ -679,7 +715,6 @@
         document.getElementById('joystick-container').style.display = inCar ? 'none' : 'block';
       }
 
-      // Car controls
       document.getElementById('btn-car-forward').addEventListener('touchstart', (e) => { e.preventDefault(); brCarInput.gas = 1.2; });
       document.getElementById('btn-car-forward').addEventListener('touchend', () => brCarInput.gas = 0);
       document.getElementById('btn-car-backward').addEventListener('touchstart', (e) => { e.preventDefault(); brCarInput.gas = -0.6; });
@@ -690,7 +725,6 @@
       document.getElementById('btn-car-right').addEventListener('touchstart', (e) => { e.preventDefault(); brCarInput.steer = -0.06; });
       document.getElementById('btn-car-right').addEventListener('touchend', () => brCarInput.steer = 0);
 
-      // Minimap
       const miniCanvas = document.getElementById('minimap-canvas');
       const miniCtx = miniCanvas.getContext('2d');
 
@@ -746,7 +780,6 @@
         document.getElementById('defeat-modal').style.display = 'flex';
       }
 
-      // ===== MAIN BR LOOP =====
       function brAnimate() {
         brAnimFrameId = requestAnimationFrame(brAnimate);
 
@@ -762,7 +795,6 @@
         brCameraAngleYaw += (brTargetYaw - brCameraAngleYaw) * 0.15;
         brCameraAnglePitch += (brTargetPitch - brCameraAnglePitch) * 0.15;
 
-        // Gravity & Jump
         if(!brPlayer.grounded) {
           brCharacterGroup.position.y += brPlayer.yVelocity;
           brPlayer.yVelocity -= 0.032;
@@ -773,12 +805,10 @@
           }
         }
 
-        // Vehicle proximity
         let nearVeh = false;
         brVehicles.forEach(v => { if(brCharacterGroup.position.distanceTo(v.position) < 5) nearVeh = true; });
         document.getElementById('btn-vehicle-enter').style.display = (nearVeh || brActiveVehicle) ? 'flex' : 'none';
 
-        // Vehicle physics
         if(brActiveVehicle) {
           brActiveVehicle.userData.speed = brCarInput.gas;
           brActiveVehicle.rotation.y += brCarInput.steer;
@@ -799,7 +829,6 @@
             }
           }
         } else {
-          // Character movement
           if(Math.abs(brJoystickInput.x) > 0.05 || Math.abs(brJoystickInput.y) > 0.05) {
             const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), brCameraAngleYaw);
             const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), brCameraAngleYaw);
@@ -820,7 +849,6 @@
           }
         }
 
-        // Loot & Health
         for(let i = brLootCrates.length - 1; i >= 0; i--) {
           if(brCharacterGroup.position.distanceTo(brLootCrates[i].position) < 2.0) {
             brScene.remove(brLootCrates[i]); brLootCrates.splice(i, 1);
@@ -837,7 +865,6 @@
           }
         }
 
-        // Bullets & Zombies
         for(let i = brBullets.length - 1; i >= 0; i--) {
           const b = brBullets[i]; b.position.add(b.velocity);
           let bulletUsed = false;
@@ -865,7 +892,6 @@
           }
         }
 
-        // Zombie AI
         const targetPos = brActiveVehicle ? brActiveVehicle.position : brCharacterGroup.position;
         brZombies.forEach(z => {
           const dir = new THREE.Vector3().subVectors(targetPos, z.position).normalize();
@@ -887,7 +913,6 @@
           }
         });
 
-        // Camera
         const activeObj = brActiveVehicle || brCharacterGroup;
         const camDist = brActiveVehicle ? 8.5 : 4.8; 
         const camHeight = brActiveVehicle ? 3.5 : (brPlayer.mode === 'lie' ? 1.2 : (brPlayer.mode === 'sit' ? 1.6 : 2.2));
@@ -924,10 +949,8 @@
         brHealthPacks.push(group);
       }
 
-      // Start BR loop
       brAnimate();
 
-      // Cleanup function
       window.brCleanup = function() {
         if (brAnimFrameId) cancelAnimationFrame(brAnimFrameId);
         if (brRenderer && brRenderer.domElement) {
@@ -938,7 +961,7 @@
     }
 
     // ============================================================
-    // ARENA MODE (Imported from provided code with adjustments)
+    // ARENA MODE
     // ============================================================
     let arenaInitialized = false;
     let arenaScene, arenaCamera, arenaRenderer;
@@ -976,7 +999,6 @@
       arenaRenderer.shadowMap.enabled = true;
       container.appendChild(arenaRenderer.domElement);
 
-      // Lighting
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
       arenaScene.add(ambientLight);
       const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -984,7 +1006,6 @@
       dirLight.castShadow = true;
       arenaScene.add(dirLight);
 
-      // Ground
       const groundGeo = new THREE.PlaneGeometry(arenaMapSize, arenaMapSize);
       const groundMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
       const ground = new THREE.Mesh(groundGeo, groundMat);
@@ -996,21 +1017,14 @@
       grid.position.y = 0.01;
       arenaScene.add(grid);
 
-      // Arena walls (invisible colliders)
-      // Just add boundary colliders logic in update
-
-      // Create Player
       createArenaPlayer();
 
-      // Spawn Initial Zombies
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 8; i++) {
         spawnArenaZombie();
       }
 
-      // Setup Arena UI
       setupArenaUI();
 
-      // Start Loop
       arenaAnimate();
 
       window.addEventListener('resize', onArenaWindowResize);
@@ -1063,43 +1077,34 @@
       arenaZombies.push({
         mesh: zombie,
         health: 100,
-        speed: 0.03 + Math.random() * 0.03
+        speed: 0.04 + Math.random() * 0.03
       });
 
       updateArenaStats();
     }
 
     function setupArenaUI() {
-      // Create arena UI elements dynamically or use existing ones
-      // We'll reuse the same UI but with arena-specific updates
-      // Add arena overlay if needed
-      const arenaContainer = document.getElementById('arena-container');
       arenaContainer.style.display = 'block';
       arenaContainer.innerHTML = `
-        <div id="arena-stats-panel" style="position:absolute; top:170px; left:15px; background:rgba(0,0,0,0.65); padding:10px 15px; border-radius:8px; border-left:4px solid #ff4444; color:white; font-size:14px; font-weight:bold; display:flex; flex-direction:column; gap:6px; z-index:10;">
-          <div class="stat-item">Kills: <span id="arena-kills-val" style="color:#ffeb3b;">0</span></div>
-          <div class="stat-item">Zombies Alive: <span id="arena-alive-val" style="color:#ffeb3b;">0</span></div>
-          <div class="stat-item">Ammo: <span id="arena-ammo-val" style="color:#ffeb3b;">30 / ∞</span></div>
+        <div class="arena-stat-panel">
+          <div class="arena-stat-item">Kills: <span id="arena-kills-val" class="arena-stat-value">0</span></div>
+          <div class="arena-stat-item">Zombies Alive: <span id="arena-alive-val" class="arena-stat-value">0</span></div>
+          <div class="arena-stat-item">Ammo: <span id="arena-ammo-val" class="arena-stat-value">30 / ∞</span></div>
         </div>
-        <div id="arena-aim-reticle" style="position:absolute; width:20px; height:20px; border:2px solid rgba(255,50,50,0.8); border-radius:50%; pointer-events:none; transform:translate(-50%,-50%); z-index:8; box-shadow:0 0 4px #ff0000;"></div>
-        <div id="arena-health-container" style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:200px; height:16px; background:rgba(0,0,0,0.6); border:2px solid #fff; border-radius:10px; overflow:hidden; z-index:10;">
-          <div id="arena-health-bar" style="width:100%; height:100%; background:#4CAF50; transition:width 0.2s;"></div>
-        </div>
-        <button id="arena-fire-btn" style="position:absolute; bottom:30px; right:30px; width:80px; height:80px; background:rgba(255,50,50,0.4); border:2px solid rgba(255,100,100,0.8); border-radius:50%; color:white; font-weight:bold; font-size:18px; z-index:10; touch-action:manipulation;">FIRE</button>
-        <button id="arena-reload-btn" style="position:absolute; bottom:120px; right:40px; width:55px; height:55px; background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.5); border-radius:50%; color:white; font-weight:bold; font-size:12px; z-index:10; touch-action:manipulation;">RELOAD</button>
-        <div id="arena-joystick-zone" style="position:absolute; bottom:30px; left:30px; width:120px; height:120px; background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.2); border-radius:50%; z-index:10;">
-          <div id="arena-joystick-knob" style="position:absolute; top:35px; left:35px; width:50px; height:50px; background:rgba(255,255,255,0.4); border-radius:50%;"></div>
+        <div class="arena-aim-reticle" id="arena-aim-reticle"></div>
+        <div class="arena-health-container"><div class="arena-health-bar" id="arena-health-bar"></div></div>
+        <button class="arena-fire-btn" id="arena-fire-btn">FIRE</button>
+        <button class="arena-reload-btn" id="arena-reload-btn">RELOAD</button>
+        <div class="arena-joystick-zone" id="arena-joystick-zone">
+          <div class="arena-joystick-knob" id="arena-joystick-knob"></div>
         </div>
       `;
 
-      // Arena controls
       document.getElementById('arena-fire-btn').addEventListener('touchstart', (e) => { e.preventDefault(); arenaShoot(); });
       document.getElementById('arena-reload-btn').addEventListener('touchstart', (e) => { e.preventDefault(); arenaReload(); });
 
-      // Arena joystick
       const joyZone = document.getElementById('arena-joystick-zone');
       const joyKnob = document.getElementById('arena-joystick-knob');
-      const joyRadius = 60;
 
       joyZone.addEventListener('touchstart', (e) => {
         e.preventDefault();
@@ -1139,7 +1144,6 @@
         }
       });
 
-      // Camera look on right side
       window.addEventListener('touchstart', (e) => {
         for (let touch of e.changedTouches) {
           if (touch.clientX > window.innerWidth / 2 && arenaTouchLookId === null) {
@@ -1253,7 +1257,7 @@
 
       arenaCamera.position.set(camX, camY, camZ);
 
-      // FIXED AIM: always at zombie chest height (y=1.3)
+      // AIM TARGET AT ZOMBIE CHEST LEVEL (y=1.3) - FIXED
       const aimDistance = 15;
       arenaAimTarget3D.x = arenaPlayer.position.x - aimDistance * Math.sin(arenaCameraYaw);
       arenaAimTarget3D.y = 1.3;
@@ -1261,7 +1265,6 @@
 
       arenaCamera.lookAt(arenaAimTarget3D);
 
-      // Project aim to UI reticle
       const projectedAim = arenaAimTarget3D.clone().project(arenaCamera);
       const x = (projectedAim.x * 0.5 + 0.5) * window.innerWidth;
       const y = (-(projectedAim.y * 0.5) + 0.5) * window.innerHeight;
@@ -1293,7 +1296,6 @@
               arenaZombies.splice(j, 1);
               arenaKills++;
               updateArenaStats();
-              // Respawn zombie after delay
               setTimeout(spawnArenaZombie, 500);
             }
             break;
@@ -1320,7 +1322,6 @@
           arenaHealth -= 0.2;
           document.getElementById('arena-health-bar').style.width = `${Math.max(0, arenaHealth)}%`;
           if (arenaHealth <= 0) {
-            // Game Over
             alert("Game Over! Kills: " + arenaKills);
             backToLobby();
           }
@@ -1335,7 +1336,6 @@
       const mapScale = 70 / arenaMapSize;
       const center = 35;
 
-      // Player
       const px = center + arenaPlayer.position.x * mapScale;
       const pz = center + arenaPlayer.position.z * mapScale;
       ctx.fillStyle = '#2196F3';
@@ -1343,7 +1343,6 @@
       ctx.arc(px, pz, 3, 0, Math.PI * 2);
       ctx.fill();
 
-      // Zombies
       ctx.fillStyle = '#ff3333';
       arenaZombies.forEach(z => {
         const zx = center + z.mesh.position.x * mapScale;
@@ -1367,57 +1366,8 @@
         arenaRenderer.domElement.remove();
       }
       arenaInitialized = false;
-      document.getElementById('arena-container').innerHTML = '';
-    };
-
-    // ============================================================
-    // AUDIO ENGINE (shared)
-    // ============================================================
-    const AudioEngine = {
-      ctx: null,
-      init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); if(this.ctx.state === 'suspended') this.ctx.resume(); },
-      playGunshot() {
-        this.init(); const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
-        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(10, now + 0.15);
-        gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.15);
-      },
-      playFootstep() {
-        this.init(); const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
-        osc.type = 'sine'; osc.frequency.setValueAtTime(80, now); osc.frequency.exponentialRampToValueAtTime(30, now + 0.05);
-        gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.05);
-      },
-      playPickup() {
-        this.init(); const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
-        osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
-        gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.1);
-      },
-      playHeal() {
-        this.init(); const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
-        osc.type = 'sine'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(600, now + 0.2);
-        gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.2);
-      },
-      playZombieDie() {
-        this.init(); const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
-        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
-        gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.3);
-      },
-      playHit() {
-        this.init(); const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
-        osc.type = 'square'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(50, now + 0.1);
-        gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(now + 0.1);
-      }
+      arenaContainer.innerHTML = '';
+      arenaContainer.style.display = 'none';
     };
 
     // ============================================================
@@ -1425,9 +1375,7 @@
     // ============================================================
     function initGame() {
       if (currentMode === 'battle-royale') {
-        // Hide arena container
-        document.getElementById('arena-container').style.display = 'none';
-        // Show BR UI
+        arenaContainer.style.display = 'none';
         topLeftHud.style.display = 'flex';
         crosshair.style.display = 'block';
         uiLayer.style.display = 'block';
@@ -1435,7 +1383,6 @@
         isGameStarted = true;
         initBattleRoyale();
       } else if (currentMode === 'arena') {
-        // Hide BR UI
         topLeftHud.style.display = 'none';
         crosshair.style.display = 'none';
         uiLayer.style.display = 'none';
@@ -1464,10 +1411,9 @@
       topLeftHud.style.display = 'none';
       crosshair.style.display = 'none';
       uiLayer.style.display = 'none';
-      document.getElementById('arena-container').style.display = 'none';
+      arenaContainer.style.display = 'none';
     });
 
-    // Make functions globally accessible for modal buttons
     window.restartGame = restartGame;
     window.backToLobby = backToLobby;
   </script>
