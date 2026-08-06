@@ -41,18 +41,18 @@
     #joystick-container { position: absolute; bottom: 35px; left: 40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.25); border-radius: 50%; backdrop-filter: blur(6px); pointer-events: auto; touch-action: none; }
     #joystick-knob { position: absolute; top: 50%; left: 50%; width: 46px; height: 46px; background: rgba(255,255,255,0.7); border-radius: 50%; transform: translate(-50%,-50%); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
     
-    /* Action Buttons Base */
+    /* Action Buttons Base - shifted slightly right to fill space */
     .action-btn { position: absolute; background: rgba(15, 23, 42, 0.8); color: #fff; border: 1.5px solid rgba(255,255,255,0.35); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 700; font-size: 11px; backdrop-filter: blur(6px); pointer-events: auto; touch-action: manipulation; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
     .action-btn:active, .action-btn.active { background: rgba(34,197,94,0.85); transform: scale(0.92); }
     
-    /* SPECIFIC LAYOUT: Fire -> Jump (Right) -> Sit (Below Jump) -> Lie (Left of Sit) -> Reload (Left of Lie) */
-    #btn-fire { bottom: 100px; right: 155px; width: 70px; height: 70px; background: rgba(220,38,38,0.85); border-color: #fca5a5; font-size: 13px; }
-    #btn-jump { bottom: 105px; right: 80px; width: 58px; height: 58px; }
-    #btn-sit { bottom: 35px; right: 80px; width: 58px; height: 58px; }
-    #btn-lie { bottom: 35px; right: 150px; width: 58px; height: 58px; }
-    #btn-reload { bottom: 35px; right: 220px; width: 58px; height: 58px; background: rgba(234,179,8,0.85); border-color: #fef08a; }
+    /* BUTTONS SHIFTED RIGHT TO FILL SPACE - adjusted positions */
+    #btn-fire { bottom: 100px; right: 130px; width: 70px; height: 70px; background: rgba(220,38,38,0.85); border-color: #fca5a5; font-size: 13px; }
+    #btn-jump { bottom: 105px; right: 55px; width: 58px; height: 58px; }
+    #btn-sit { bottom: 35px; right: 55px; width: 58px; height: 58px; }
+    #btn-lie { bottom: 35px; right: 120px; width: 58px; height: 58px; }
+    #btn-reload { bottom: 35px; right: 185px; width: 58px; height: 58px; background: rgba(234,179,8,0.85); border-color: #fef08a; }
     
-    #btn-vehicle-enter { display: none; position: absolute; bottom: 180px; right: 140px; width: 68px; height: 68px; border-radius: 14px; background: rgba(37,99,235,0.85); border: 2px solid #93c5fd; color: #fff; font-size: 10px; font-weight: bold; text-align: center; pointer-events: auto; justify-content: center; align-items: center; backdrop-filter: blur(6px); }
+    #btn-vehicle-enter { display: none; position: absolute; bottom: 180px; right: 120px; width: 68px; height: 68px; border-radius: 14px; background: rgba(37,99,235,0.85); border: 2px solid #93c5fd; color: #fff; font-size: 10px; font-weight: bold; text-align: center; pointer-events: auto; justify-content: center; align-items: center; backdrop-filter: blur(6px); }
 
     /* Vehicle Drive UI */
     #car-ui-left { display: none; position: absolute; bottom: 35px; left: 40px; gap: 15px; pointer-events: auto; }
@@ -70,6 +70,19 @@
     #lobby-screen { position: absolute; top:0; left:0; width:100%; height:100%; z-index:50; display:flex; flex-direction:column; justify-content:space-between; padding:30px; pointer-events:auto; background: linear-gradient(180deg, rgba(15,23,42,0.7) 0%, rgba(0,0,0,0.3) 50%, rgba(15,23,42,0.9) 100%); }
     .lobby-title { color: #38bdf8; font-size: 32px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 16px rgba(56,189,248,0.6); }
     .btn-start { position: absolute; bottom: 40px; right: 40px; padding: 16px 42px; background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; font-size: 18px; font-weight: 800; border: 2px solid #86efac; border-radius: 12px; cursor: pointer; box-shadow: 0 6px 20px rgba(34,197,94,0.4); letter-spacing: 1px; }
+
+    /* MODE SELECTION OVERLAY */
+    #mode-select-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); z-index: 60; flex-direction: column; justify-content: center; align-items: center; gap: 40px; color: #fff; pointer-events: auto; }
+    #mode-select-overlay.active { display: flex; }
+    .mode-grid { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; }
+    .mode-card { background: linear-gradient(145deg, #1e293b, #0f172a); border-radius: 24px; padding: 30px 40px; width: 220px; text-align: center; border: 2px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.3s; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+    .mode-card:hover { border-color: #38bdf8; transform: translateY(-5px); }
+    .mode-card .mode-icon { font-size: 48px; margin-bottom: 10px; display: block; }
+    .mode-card h3 { color: #fff; font-size: 20px; margin-bottom: 6px; }
+    .mode-card p { color: #94a3b8; font-size: 13px; }
+    .mode-card .mode-badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-top: 10px; }
+    .mode-card .badge-br { background: #ef4444; color: #fff; }
+    .mode-card .badge-arena { background: #eab308; color: #000; }
 
     /* Tactical Full Map Modal */
     #fullmap-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 80vw; height: 80vh; background: rgba(15,23,42,0.95); border: 2px solid #38bdf8; border-radius: 16px; z-index: 200; pointer-events: auto; padding: 16px; flex-direction: column; backdrop-filter: blur(12px); box-shadow: 0 0 30px rgba(0,0,0,0.8); }
@@ -97,6 +110,9 @@
     /* FIX: Left HUD alignment */
     #top-left-hud .hud-card .hud-icon { margin-right: 2px; }
     #top-left-hud .hud-card span { color: #38bdf8; font-weight: 700; }
+
+    /* Arena Mode specific - overlay if needed */
+    #arena-container { display: none; position: absolute; top:0; left:0; width:100%; height:100%; z-index:5; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -123,6 +139,26 @@
       <p style="color:#94a3b8; font-size:13px; margin-top:4px;">SURVIVAL FPS ZOMBIE OUTBREAK</p>
     </div>
     <button id="btn-start-game" class="btn-start">START GAME</button>
+  </div>
+
+  <!-- MODE SELECTION OVERLAY -->
+  <div id="mode-select-overlay">
+    <h2 style="color:#38bdf8; font-size:28px; margin-bottom:10px;">SELECT MODE</h2>
+    <div class="mode-grid">
+      <div class="mode-card" data-mode="battle-royale">
+        <span class="mode-icon">⚔️</span>
+        <h3>Battle Royale</h3>
+        <p>Open world survival. 50 zombies. Vehicles. Loot.</p>
+        <span class="mode-badge badge-br">CLASSIC</span>
+      </div>
+      <div class="mode-card" data-mode="arena">
+        <span class="mode-icon">🏟️</span>
+        <h3>Arena</h3>
+        <p>Fast-paced zombie slaughter in a closed arena.</p>
+        <span class="mode-badge badge-arena">NEW</span>
+      </div>
+    </div>
+    <button id="btn-back-lobby" style="margin-top:20px; background:rgba(255,255,255,0.1); border:1px solid #fff; color:#fff; padding:10px 30px; border-radius:30px; font-size:14px; cursor:pointer;">← BACK</button>
   </div>
 
   <!-- Left Top Corner HUD (Map + Alive + Kill + Ammo) - MOVED TO LEFT -->
@@ -161,7 +197,7 @@
     <canvas id="fullmap-canvas"></canvas>
   </div>
 
-  <!-- Standard Character UI -->
+  <!-- Standard Character UI (BATTLE ROYALE) -->
   <div id="ui-layer">
     <div id="joystick-container"><div id="joystick-knob"></div></div>
     
@@ -196,6 +232,11 @@
     <div id="vitals-container">
       <div class="vital-bar-bg"><div id="hp-bar" class="vital-bar-fill" style="width:100%"></div></div>
     </div>
+  </div>
+
+  <!-- ARENA MODE UI (Overlay) -->
+  <div id="arena-container">
+    <!-- Arena specific elements injected via JS -->
   </div>
 
   <!-- Car Control UI -->
@@ -245,11 +286,1093 @@
   </div>
 
   <script>
-    // --- LOCAL STORAGE DATA ---
-    let gameStats = JSON.parse(localStorage.getItem('stardust_warrior_stats')) || { totalKills: 0, gamesPlayed: 0 };
-    function saveStats() { localStorage.setItem('stardust_warrior_stats', JSON.stringify(gameStats)); }
+    // ============================================================
+    // GLOBAL STATE & MODE MANAGEMENT
+    // ============================================================
+    let currentMode = 'battle-royale'; // 'battle-royale' or 'arena'
+    let isGameStarted = false;
 
-    // --- AUDIO SYNTHESIZER ---
+    // References to core UI elements
+    const lobbyScreen = document.getElementById('lobby-screen');
+    const modeSelectOverlay = document.getElementById('mode-select-overlay');
+    const btnStartGame = document.getElementById('btn-start-game');
+    const btnBackLobby = document.getElementById('btn-back-lobby');
+    const topLeftHud = document.getElementById('top-left-hud');
+    const crosshair = document.getElementById('crosshair');
+    const uiLayer = document.getElementById('ui-layer');
+    const exitBtn = document.getElementById('btn-exit');
+
+    // --- MODE SELECTION LOGIC ---
+    // Show mode selection when START is clicked
+    btnStartGame.addEventListener('click', () => {
+      modeSelectOverlay.classList.add('active');
+    });
+
+    // Back to lobby from mode select
+    btnBackLobby.addEventListener('click', () => {
+      modeSelectOverlay.classList.remove('active');
+    });
+
+    // Mode card click handlers
+    document.querySelectorAll('.mode-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const mode = card.dataset.mode;
+        currentMode = mode;
+        modeSelectOverlay.classList.remove('active');
+        // Start the game with selected mode
+        initGame();
+      });
+    });
+
+    // Exit button goes back to lobby (clears game state)
+    exitBtn.addEventListener('click', backToLobby);
+
+    function backToLobby() {
+      // Reset everything
+      isGameStarted = false;
+      document.querySelectorAll('.game-modal').forEach(m => m.style.display = 'none');
+      lobbyScreen.style.display = 'flex';
+      topLeftHud.style.display = 'none';
+      crosshair.style.display = 'none';
+      uiLayer.style.display = 'none';
+      document.getElementById('arena-container').style.display = 'none';
+      // Clean up arena if active
+      if (window.arenaCleanup) window.arenaCleanup();
+      // Reset BR game if needed
+      if (window.brCleanup) window.brCleanup();
+      // Show exit button always
+      exitBtn.style.display = 'flex';
+      // Reload to fully clean state? simpler: location.reload()
+      // But we want to keep mode selection, so we just hide everything.
+      // Actually, for clean slate we reload.
+      location.reload();
+    }
+
+    function restartGame() {
+      location.reload();
+    }
+
+    // ============================================================
+    // BATTLE ROYALE MODE (Existing Game)
+    // ============================================================
+    let brInitialized = false;
+    let brScene, brCamera, brRenderer;
+    let brCharacterGroup, brBodyMeshGroup, brGunMesh;
+    let brZombies = [], brBullets = [], brLootCrates = [], brHealthPacks = [], brVehicles = [];
+    let brObstacleColliders = [];
+    let brActiveVehicle = null;
+    let brPlayer = { hp: 100, kills: 0, ammo: 30, reserveAmmo: 120, maxClip: 30, speed: 0.9, yVelocity: 0, grounded: true, mode: 'stand' };
+    let brZombiesRemaining = 50;
+    const BR_TOTAL_ZOMBIES = 50;
+    let brTargetYaw = 0, brTargetPitch = 0.05;
+    let brCameraAngleYaw = 0, brCameraAnglePitch = 0.05;
+    let brJoystickInput = { x: 0, y: 0 };
+    let brIsSwiping = false, brActiveTouchId = null, brLastTX = 0, brLastTY = 0;
+    let brFootstepTimer = 0;
+    let brCarInput = { gas: 0, steer: 0 };
+    let brJoyActive = false, brJoyOrigin = { x: 0, y: 0 };
+    let brAnimFrameId = null;
+
+    function initBattleRoyale() {
+      if (brInitialized) return;
+      brInitialized = true;
+
+      // Setup Three.js
+      const container = document.getElementById('canvas-container');
+      brScene = new THREE.Scene();
+      brScene.background = new THREE.Color(0x38bdf8);
+      brScene.fog = new THREE.FogExp2(0x38bdf8, 0.0035);
+      brCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      brRenderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+      brRenderer.setSize(window.innerWidth, window.innerHeight);
+      brRenderer.shadowMap.enabled = true;
+      container.appendChild(brRenderer.domElement);
+
+      // Lights
+      brScene.add(new THREE.AmbientLight(0xffffff, 0.7));
+      const sunLight = new THREE.DirectionalLight(0xfffbe1, 1.2);
+      sunLight.position.set(100, 150, 50);
+      sunLight.castShadow = true;
+      brScene.add(sunLight);
+
+      // World
+      const worldSize = 800;
+      const ground = new THREE.Mesh(new THREE.PlaneGeometry(worldSize, worldSize), new THREE.MeshStandardMaterial({ color: 0x2d5a27, roughness: 0.9 }));
+      ground.rotation.x = -Math.PI / 2;
+      ground.receiveShadow = true;
+      brScene.add(ground);
+
+      // Mountains
+      for(let i = 0; i < 25; i++) {
+        const h = 30 + Math.random() * 40; const r = 18 + Math.random() * 20;
+        const m = new THREE.Mesh(new THREE.ConeGeometry(r, h, 6), new THREE.MeshStandardMaterial({ color: 0x525252, roughness: 0.8 }));
+        const x = (Math.random() - 0.5) * 700; const z = (Math.random() - 0.5) * 700;
+        m.position.set(x, h/2, z); brScene.add(m);
+        brObstacleColliders.push({ type: 'cylinder', x: x, z: z, radius: r * 0.75 });
+      }
+
+      // Trees
+      for(let i = 0; i < 140; i++) {
+        const tree = new THREE.Group();
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.7, 3.5), new THREE.MeshStandardMaterial({ color: 0x543d2b }));
+        trunk.position.y = 1.75; tree.add(trunk);
+        const leaves = new THREE.Mesh(new THREE.ConeGeometry(2.5 + Math.random(), 5, 6), new THREE.MeshStandardMaterial({ color: 0x15803d }));
+        leaves.position.y = 5; tree.add(leaves);
+        const x = (Math.random() - 0.5) * 650; const z = (Math.random() - 0.5) * 650;
+        tree.position.set(x, 0, z); brScene.add(tree);
+        brObstacleColliders.push({ type: 'cylinder', x: x, z: z, radius: 1.2 });
+      }
+
+      // Roads
+      const roadMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6 });
+      const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(16, worldSize), roadMat);
+      mainRoad.rotation.x = -Math.PI / 2; mainRoad.position.y = 0.02; brScene.add(mainRoad);
+
+      // Loot Crates & Health Packs
+      function spawnLootCrate(x, z) {
+        const group = new THREE.Group();
+        const ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.9, 24), new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xf97316, emissiveIntensity: 0.3, side: THREE.DoubleSide }));
+        ring.rotation.x = -Math.PI / 2; ring.position.y = 1.2; group.add(ring);
+        const glow = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xf97316, emissiveIntensity: 0.5 }));
+        glow.position.y = 1.2; group.add(glow);
+        group.position.set(x, 0, z); brScene.add(group);
+        brLootCrates.push(group);
+      }
+
+      function spawnHealthPack(x, z) {
+        const group = new THREE.Group();
+        const box = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.6), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+        box.position.y = 0.5; group.add(box);
+        const crossHorizontal = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.42, 0.12), new THREE.MeshStandardMaterial({ color: 0xef4444 }));
+        crossHorizontal.position.y = 0.51; group.add(crossHorizontal);
+        const crossVertical = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.42, 0.4), new THREE.MeshStandardMaterial({ color: 0xef4444 }));
+        crossVertical.position.y = 0.51; group.add(crossVertical);
+        group.position.set(x, 0, z); brScene.add(group);
+        brHealthPacks.push(group);
+      }
+
+      for(let i = 0; i < 35; i++) {
+        spawnLootCrate((Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500);
+      }
+
+      // Vehicles
+      function createVehicle(x, z, color) {
+        const g = new THREE.Group();
+        const body = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.2, 4.5), new THREE.MeshStandardMaterial({ color: color || 0xd97706 }));
+        body.position.y = 0.8; g.add(body);
+        const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.9, 2.4), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
+        cabin.position.set(0, 1.7, -0.2); g.add(cabin);
+        g.position.set(x, 0, z); brScene.add(g);
+        g.userData = { speed: 0, steerAngle: 0, radius: 2.2 };
+        brVehicles.push(g); return g;
+      }
+      createVehicle(12, 15, 0xd97706);
+      createVehicle(-40, -50, 0x2563eb);
+
+      // Player
+      brCharacterGroup = new THREE.Group(); brScene.add(brCharacterGroup);
+      brBodyMeshGroup = new THREE.Group(); brCharacterGroup.add(brBodyMeshGroup);
+      const torso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), new THREE.MeshStandardMaterial({ color: 0x0284c7 }));
+      torso.position.y = 1.4; brBodyMeshGroup.add(torso);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), new THREE.MeshStandardMaterial({ color: 0xffdbac }));
+      head.position.y = 2.25; brBodyMeshGroup.add(head);
+      brGunMesh = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.85), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
+      brGunMesh.position.set(0.38, 1.35, -0.4); brBodyMeshGroup.add(brGunMesh);
+
+      // Zombies
+      function createHealthBarCanvas() {
+        const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 12;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0, 0, 64, 12);
+        ctx.fillStyle = '#ef4444'; ctx.fillRect(2, 2, 60, 8);
+        const texture = new THREE.CanvasTexture(canvas);
+        const spriteMat = new THREE.SpriteMaterial({ map: texture });
+        const sprite = new THREE.Sprite(spriteMat);
+        sprite.scale.set(1.5, 0.3, 1); sprite.position.y = 2.6;
+        return { sprite, canvas, ctx, texture };
+      }
+
+      function updateZombieHealthBar(z) {
+        const pct = Math.max(0, z.userData.hp / 100);
+        const ctx = z.userData.hb.ctx;
+        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0, 0, 64, 12);
+        ctx.fillStyle = '#ef4444'; ctx.fillRect(2, 2, 60 * pct, 8);
+        z.userData.hb.texture.needsUpdate = true;
+      }
+
+      function spawnZombie() {
+        const g = new THREE.Group();
+        const zMat = new THREE.MeshStandardMaterial({ color: 0x16a34a });
+        const zTorso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), zMat); zTorso.position.y = 1.2; g.add(zTorso);
+        const zHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 12, 12), new THREE.MeshStandardMaterial({ color: 0x15803d })); zHead.position.y = 2.0; g.add(zHead);
+        const hb = createHealthBarCanvas(); g.add(hb.sprite);
+        const angle = Math.random() * Math.PI * 2; const dist = 35 + Math.random() * 45;
+        g.position.set(brCharacterGroup.position.x + Math.cos(angle)*dist, 0, brCharacterGroup.position.z + Math.sin(angle)*dist);
+        g.userData = { hp: 100, speed: 0.12, hb: hb, radius: 0.8 };
+        brScene.add(g); brZombies.push(g);
+      }
+      for(let i = 0; i < 12; i++) spawnZombie();
+
+      // ===== Controls Setup =====
+      // Touch swipes for camera
+      window.addEventListener('touchstart', (e) => {
+        if(!isGameStarted || currentMode !== 'battle-royale') return;
+        for(let t of e.changedTouches) {
+          if(t.clientX > window.innerWidth / 3 && brActiveTouchId === null) {
+            brIsSwiping = true;
+            brActiveTouchId = t.identifier;
+            brLastTX = t.clientX;
+            brLastTY = t.clientY;
+          }
+        }
+      });
+
+      window.addEventListener('touchmove', (e) => {
+        if(!brIsSwiping || !isGameStarted || currentMode !== 'battle-royale') return;
+        for(let t of e.changedTouches) {
+          if(t.identifier === brActiveTouchId) {
+            const dx = t.clientX - brLastTX;
+            const dy = t.clientY - brLastTY;
+            brTargetYaw -= dx * 0.004;
+            brTargetPitch -= dy * 0.003;
+            brTargetPitch = Math.max(-0.25, Math.min(Math.PI / 3, brTargetPitch));
+            brLastTX = t.clientX;
+            brLastTY = t.clientY;
+          }
+        }
+      }, { passive: false });
+
+      window.addEventListener('touchend', (e) => {
+        for(let t of e.changedTouches) {
+          if(t.identifier === brActiveTouchId) {
+            brIsSwiping = false;
+            brActiveTouchId = null;
+          }
+        }
+      });
+
+      // Joystick
+      const joyCont = document.getElementById('joystick-container');
+      const joyKnob = document.getElementById('joystick-knob');
+
+      joyCont.addEventListener('touchstart', (e) => {
+        if(!isGameStarted || currentMode !== 'battle-royale') return;
+        const t = e.touches[0]; const rect = joyCont.getBoundingClientRect();
+        brJoyOrigin = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+        brJoyActive = true;
+      });
+      window.addEventListener('touchmove', (e) => {
+        if(!brJoyActive || currentMode !== 'battle-royale') return;
+        const t = e.touches[0]; const dx = t.clientX - brJoyOrigin.x; const dy = t.clientY - brJoyOrigin.y;
+        const dist = Math.min(Math.hypot(dx, dy), 40); const ang = Math.atan2(dy, dx);
+        joyKnob.style.transform = `translate(calc(-50% + ${Math.cos(ang)*dist}px), calc(-50% + ${Math.sin(ang)*dist}px))`;
+        brJoystickInput.x = Math.cos(ang) * (dist / 40);
+        brJoystickInput.y = -Math.sin(ang) * (dist / 40);
+      });
+      window.addEventListener('touchend', () => {
+        brJoyActive = false; joyKnob.style.transform = 'translate(-50%, -50%)';
+        brJoystickInput = { x: 0, y: 0 };
+      });
+
+      // Shooting
+      function shoot() {
+        if(!isGameStarted || currentMode !== 'battle-royale' || brActiveVehicle || brPlayer.ammo <= 0) return;
+        brPlayer.ammo--; updateBRHUD();
+        AudioEngine.playGunshot();
+
+        const b = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0xfacc15 }));
+        let gunWorldPos = new THREE.Vector3();
+        brGunMesh.getWorldPosition(gunWorldPos);
+        b.position.copy(gunWorldPos);
+        const dir = new THREE.Vector3(); 
+        brCamera.getWorldDirection(dir);
+        b.velocity = dir.multiplyScalar(3.2); 
+        brScene.add(b); brBullets.push(b);
+      }
+
+      document.getElementById('btn-fire').addEventListener('touchstart', (e) => { e.preventDefault(); if(currentMode === 'battle-royale') shoot(); });
+      document.getElementById('btn-jump').addEventListener('touchstart', (e) => { 
+        e.preventDefault(); 
+        if(currentMode !== 'battle-royale') return;
+        if(brPlayer.grounded) { 
+          brPlayer.yVelocity = 0.42;
+          brPlayer.grounded = false; 
+          brPlayer.mode = 'stand';
+          updateBRPose();
+        } 
+      });
+      document.getElementById('btn-sit').addEventListener('touchstart', (e) => { 
+        e.preventDefault(); 
+        if(currentMode !== 'battle-royale') return;
+        brPlayer.mode = (brPlayer.mode === 'sit') ? 'stand' : 'sit';
+        updateBRPose();
+      });
+      document.getElementById('btn-lie').addEventListener('touchstart', (e) => { 
+        e.preventDefault(); 
+        if(currentMode !== 'battle-royale') return;
+        brPlayer.mode = (brPlayer.mode === 'lie') ? 'stand' : 'lie';
+        updateBRPose();
+      });
+      document.getElementById('btn-reload').addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if(currentMode !== 'battle-royale') return;
+        const needed = brPlayer.maxClip - brPlayer.ammo;
+        if(needed > 0 && brPlayer.reserveAmmo > 0) {
+          const reloadAmount = Math.min(needed, brPlayer.reserveAmmo);
+          brPlayer.ammo += reloadAmount; 
+          brPlayer.reserveAmmo -= reloadAmount; 
+          updateBRHUD();
+        }
+      });
+
+      function updateBRPose() {
+        document.getElementById('btn-sit').classList.toggle('active', brPlayer.mode === 'sit');
+        document.getElementById('btn-lie').classList.toggle('active', brPlayer.mode === 'lie');
+
+        if (brPlayer.mode === 'sit') {
+          brBodyMeshGroup.scale.set(1, 0.65, 1);
+          brBodyMeshGroup.rotation.x = 0;
+          brBodyMeshGroup.position.y = 0;
+          brPlayer.speed = 0.35;
+        } else if (brPlayer.mode === 'lie') {
+          brBodyMeshGroup.scale.set(1, 1, 1);
+          brBodyMeshGroup.rotation.x = -Math.PI / 2.2;
+          brBodyMeshGroup.position.y = 0.35;
+          brPlayer.speed = 0.2;
+        } else {
+          brBodyMeshGroup.scale.set(1, 1, 1);
+          brBodyMeshGroup.rotation.x = 0;
+          brBodyMeshGroup.position.y = 0;
+          brPlayer.speed = 0.9;
+        }
+      }
+
+      // Vehicle boarding
+      const btnVeh = document.getElementById('btn-vehicle-enter');
+      btnVeh.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if(currentMode !== 'battle-royale') return;
+        if(!brActiveVehicle) {
+          let nearest = null, minDist = Infinity;
+          brVehicles.forEach(v => { const d = brCharacterGroup.position.distanceTo(v.position); if(d < minDist) { minDist = d; nearest = v; } });
+          if(nearest && minDist < 5) {
+            brActiveVehicle = nearest; brCharacterGroup.visible = false;
+            document.getElementById('veh-btn-text').innerText = "EXIT";
+            toggleBRCarControls(true);
+          }
+        } else {
+          brCharacterGroup.position.set(brActiveVehicle.position.x + 2.5, 0, brActiveVehicle.position.z);
+          brCharacterGroup.visible = true; brActiveVehicle = null;
+          document.getElementById('veh-btn-text').innerText = "ENTER";
+          toggleBRCarControls(false);
+        }
+      });
+
+      function toggleBRCarControls(inCar) {
+        document.getElementById('car-ui-left').style.display = inCar ? 'flex' : 'none';
+        document.getElementById('car-ui-right').style.display = inCar ? 'flex' : 'none';
+        document.getElementById('btn-fire').style.display = inCar ? 'none' : 'flex';
+        document.getElementById('btn-jump').style.display = inCar ? 'none' : 'flex';
+        document.getElementById('btn-sit').style.display = inCar ? 'none' : 'flex';
+        document.getElementById('btn-lie').style.display = inCar ? 'none' : 'flex';
+        document.getElementById('btn-reload').style.display = inCar ? 'none' : 'flex';
+        document.getElementById('joystick-container').style.display = inCar ? 'none' : 'block';
+      }
+
+      // Car controls
+      document.getElementById('btn-car-forward').addEventListener('touchstart', (e) => { e.preventDefault(); brCarInput.gas = 1.2; });
+      document.getElementById('btn-car-forward').addEventListener('touchend', () => brCarInput.gas = 0);
+      document.getElementById('btn-car-backward').addEventListener('touchstart', (e) => { e.preventDefault(); brCarInput.gas = -0.6; });
+      document.getElementById('btn-car-backward').addEventListener('touchend', () => brCarInput.gas = 0);
+      document.getElementById('btn-car-brake').addEventListener('touchstart', (e) => { e.preventDefault(); brCarInput.gas = 0; if(brActiveVehicle) brActiveVehicle.userData.speed = 0; });
+      document.getElementById('btn-car-left').addEventListener('touchstart', (e) => { e.preventDefault(); brCarInput.steer = 0.06; });
+      document.getElementById('btn-car-left').addEventListener('touchend', () => brCarInput.steer = 0);
+      document.getElementById('btn-car-right').addEventListener('touchstart', (e) => { e.preventDefault(); brCarInput.steer = -0.06; });
+      document.getElementById('btn-car-right').addEventListener('touchend', () => brCarInput.steer = 0);
+
+      // Minimap
+      const miniCanvas = document.getElementById('minimap-canvas');
+      const miniCtx = miniCanvas.getContext('2d');
+
+      function drawBRRadarMap(ctx, w, h, scale) {
+        ctx.clearRect(0, 0, w, h); const cx = w/2, cy = h/2;
+        ctx.fillStyle = '#2d5a27'; ctx.fillRect(0,0,w,h);
+        ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ef4444';
+        brZombies.forEach(z => {
+          const dx = (z.position.x - brCharacterGroup.position.x) * scale;
+          const dz = (z.position.z - brCharacterGroup.position.z) * scale;
+          if(Math.hypot(dx, dz) < w / 2) {
+            ctx.beginPath(); ctx.arc(cx + dx, cy + dz, 3, 0, Math.PI * 2); ctx.fill();
+          }
+        });
+      }
+
+      document.getElementById('minimap-container').addEventListener('click', () => {
+        document.getElementById('fullmap-modal').style.display = 'flex';
+        renderBRFullMap();
+      });
+      document.getElementById('btn-close-fullmap').addEventListener('click', () => {
+        document.getElementById('fullmap-modal').style.display = 'none';
+      });
+
+      function renderBRFullMap() {
+        const canvas = document.getElementById('fullmap-canvas');
+        canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
+        drawBRRadarMap(canvas.getContext('2d'), canvas.width, canvas.height, 0.7);
+      }
+
+      function updateBRHUD() {
+        document.getElementById('hud-alive').innerText = brZombiesRemaining;
+        document.getElementById('hud-kills').innerText = brPlayer.kills;
+        document.getElementById('hud-ammo').innerText = `${brPlayer.ammo}/${brPlayer.reserveAmmo}`;
+      }
+
+      function checkBRCollision(nextX, nextZ, radius) {
+        for(let obs of brObstacleColliders) {
+          const dist = Math.hypot(nextX - obs.x, nextZ - obs.z);
+          if(dist < radius + obs.radius) return true;
+        }
+        return false;
+      }
+
+      function showBRVictory() {
+        isGameStarted = false;
+        document.getElementById('victory-modal').style.display = 'flex';
+      }
+
+      function showBRDefeat() {
+        isGameStarted = false;
+        document.getElementById('defeat-modal').style.display = 'flex';
+      }
+
+      // ===== MAIN BR LOOP =====
+      function brAnimate() {
+        brAnimFrameId = requestAnimationFrame(brAnimate);
+
+        if(!isGameStarted || currentMode !== 'battle-royale') {
+          brCamera.position.x = brCharacterGroup.position.x + 5;
+          brCamera.position.z = brCharacterGroup.position.z + 5;
+          brCamera.position.y = 2.5;
+          brCamera.lookAt(brCharacterGroup.position);
+          brRenderer.render(brScene, brCamera);
+          return;
+        }
+
+        brCameraAngleYaw += (brTargetYaw - brCameraAngleYaw) * 0.15;
+        brCameraAnglePitch += (brTargetPitch - brCameraAnglePitch) * 0.15;
+
+        // Gravity & Jump
+        if(!brPlayer.grounded) {
+          brCharacterGroup.position.y += brPlayer.yVelocity;
+          brPlayer.yVelocity -= 0.032;
+          if(brCharacterGroup.position.y <= 0) {
+            brCharacterGroup.position.y = 0;
+            brPlayer.grounded = true;
+            brPlayer.yVelocity = 0;
+          }
+        }
+
+        // Vehicle proximity
+        let nearVeh = false;
+        brVehicles.forEach(v => { if(brCharacterGroup.position.distanceTo(v.position) < 5) nearVeh = true; });
+        document.getElementById('btn-vehicle-enter').style.display = (nearVeh || brActiveVehicle) ? 'flex' : 'none';
+
+        // Vehicle physics
+        if(brActiveVehicle) {
+          brActiveVehicle.userData.speed = brCarInput.gas;
+          brActiveVehicle.rotation.y += brCarInput.steer;
+          const driveX = brActiveVehicle.position.x - Math.sin(brActiveVehicle.rotation.y) * brActiveVehicle.userData.speed;
+          const driveZ = brActiveVehicle.position.z - Math.cos(brActiveVehicle.rotation.y) * brActiveVehicle.userData.speed;
+          if(!checkBRCollision(driveX, driveZ, brActiveVehicle.userData.radius)) {
+            brActiveVehicle.position.x = driveX; brActiveVehicle.position.z = driveZ;
+          }
+          brCharacterGroup.position.copy(brActiveVehicle.position);
+
+          for(let j = brZombies.length - 1; j >= 0; j--) {
+            if(brActiveVehicle.position.distanceTo(brZombies[j].position) < 2.5) {
+              spawnBRHealthPack(brZombies[j].position.x, brZombies[j].position.z);
+              brScene.remove(brZombies[j]); brZombies.splice(j, 1);
+              brPlayer.kills++; brZombiesRemaining--; updateBRHUD();
+              AudioEngine.playZombieDie();
+              if(brZombiesRemaining > 0) spawnZombie(); else showBRVictory();
+            }
+          }
+        } else {
+          // Character movement
+          if(Math.abs(brJoystickInput.x) > 0.05 || Math.abs(brJoystickInput.y) > 0.05) {
+            const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), brCameraAngleYaw);
+            const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), brCameraAngleYaw);
+            const moveDir = new THREE.Vector3().addScaledVector(right, brJoystickInput.x).addScaledVector(forward, brJoystickInput.y).normalize();
+
+            const nextX = brCharacterGroup.position.x + moveDir.x * brPlayer.speed;
+            const nextZ = brCharacterGroup.position.z + moveDir.z * brPlayer.speed;
+
+            if(!checkBRCollision(nextX, nextZ, 0.8)) {
+              brCharacterGroup.position.x = nextX; 
+              brCharacterGroup.position.z = nextZ;
+            }
+            brCharacterGroup.rotation.y = Math.atan2(moveDir.x, moveDir.z);
+
+            brFootstepTimer += 0.05; if(brFootstepTimer > 0.2) { brFootstepTimer = 0; AudioEngine.playFootstep(); }
+          } else {
+            brCharacterGroup.rotation.y = brCameraAngleYaw;
+          }
+        }
+
+        // Loot & Health
+        for(let i = brLootCrates.length - 1; i >= 0; i--) {
+          if(brCharacterGroup.position.distanceTo(brLootCrates[i].position) < 2.0) {
+            brScene.remove(brLootCrates[i]); brLootCrates.splice(i, 1);
+            brPlayer.reserveAmmo += 40; updateBRHUD(); AudioEngine.playPickup();
+          }
+        }
+
+        for(let i = brHealthPacks.length - 1; i >= 0; i--) {
+          if(brCharacterGroup.position.distanceTo(brHealthPacks[i].position) < 2.0) {
+            brScene.remove(brHealthPacks[i]); brHealthPacks.splice(i, 1);
+            brPlayer.hp = Math.min(100, brPlayer.hp + 35);
+            document.getElementById('hp-bar').style.width = brPlayer.hp + '%';
+            AudioEngine.playHeal();
+          }
+        }
+
+        // Bullets & Zombies
+        for(let i = brBullets.length - 1; i >= 0; i--) {
+          const b = brBullets[i]; b.position.add(b.velocity);
+          let bulletUsed = false;
+          for(let j = brZombies.length - 1; j >= 0; j--) {
+            const z = brZombies[j];
+            if(b.position.distanceTo(z.position) < 1.5) {
+              z.userData.hp -= 35; updateZombieHealthBar(z);
+              brScene.remove(b); brBullets.splice(i, 1);
+              bulletUsed = true;
+              AudioEngine.playHit();
+
+              if(z.userData.hp <= 0) {
+                AudioEngine.playZombieDie();
+                spawnBRHealthPack(z.position.x, z.position.z);
+                brScene.remove(z);
+                brZombies.splice(j, 1);
+                brPlayer.kills++; brZombiesRemaining--; updateBRHUD();
+                if(brZombiesRemaining > 0) spawnZombie(); else showBRVictory();
+              }
+              break;
+            }
+          }
+          if(!bulletUsed && b && b.position.distanceTo(brCharacterGroup.position) > 100) { 
+            brScene.remove(b); brBullets.splice(i, 1); 
+          }
+        }
+
+        // Zombie AI
+        const targetPos = brActiveVehicle ? brActiveVehicle.position : brCharacterGroup.position;
+        brZombies.forEach(z => {
+          const dir = new THREE.Vector3().subVectors(targetPos, z.position).normalize();
+          const zNextX = z.position.x + dir.x * z.userData.speed;
+          const zNextZ = z.position.z + dir.z * z.userData.speed;
+          if(!checkBRCollision(zNextX, zNextZ, z.userData.radius)) {
+            z.position.x = zNextX; z.position.z = zNextZ;
+          }
+          z.lookAt(targetPos.x, z.position.y, targetPos.z);
+
+          if(!brActiveVehicle && z.position.distanceTo(brCharacterGroup.position) < 1.3) {
+            brPlayer.hp = Math.max(0, brPlayer.hp - 0.6);
+            document.getElementById('hp-bar').style.width = brPlayer.hp + '%';
+            AudioEngine.playHit();
+            if(Math.random() < 0.02) {
+              spawnBRHealthPack(brCharacterGroup.position.x + (Math.random()-0.5)*3, brCharacterGroup.position.z + (Math.random()-0.5)*3);
+            }
+            if(brPlayer.hp <= 0) showBRDefeat();
+          }
+        });
+
+        // Camera
+        const activeObj = brActiveVehicle || brCharacterGroup;
+        const camDist = brActiveVehicle ? 8.5 : 4.8; 
+        const camHeight = brActiveVehicle ? 3.5 : (brPlayer.mode === 'lie' ? 1.2 : (brPlayer.mode === 'sit' ? 1.6 : 2.2));
+        const forwardDir = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), brCameraAngleYaw);
+        const rightDir = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), brCameraAngleYaw);
+        const shoulderOffset = brActiveVehicle ? 0 : 0.85;
+
+        const targetCamX = activeObj.position.x - forwardDir.x * camDist + rightDir.x * shoulderOffset;
+        const targetCamY = activeObj.position.y + camHeight + Math.sin(brCameraAnglePitch) * 2.2;
+        const targetCamZ = activeObj.position.z - forwardDir.z * camDist + rightDir.z * shoulderOffset;
+
+        brCamera.position.set(targetCamX, targetCamY, targetCamZ);
+
+        const lookTarget = new THREE.Vector3()
+          .copy(activeObj.position)
+          .add(rightDir.clone().multiplyScalar(shoulderOffset))
+          .add(new THREE.Vector3(0, brPlayer.mode === 'lie' ? 0.4 : 1.3, 0));
+        
+        brCamera.lookAt(lookTarget);
+
+        drawBRRadarMap(miniCtx, 70, 70, 0.8);
+        brRenderer.render(brScene, brCamera);
+      }
+
+      function spawnBRHealthPack(x, z) {
+        const group = new THREE.Group();
+        const box = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.6), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+        box.position.y = 0.5; group.add(box);
+        const crossHorizontal = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.42, 0.12), new THREE.MeshStandardMaterial({ color: 0xef4444 }));
+        crossHorizontal.position.y = 0.51; group.add(crossHorizontal);
+        const crossVertical = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.42, 0.4), new THREE.MeshStandardMaterial({ color: 0xef4444 }));
+        crossVertical.position.y = 0.51; group.add(crossVertical);
+        group.position.set(x, 0, z); brScene.add(group);
+        brHealthPacks.push(group);
+      }
+
+      // Start BR loop
+      brAnimate();
+
+      // Cleanup function
+      window.brCleanup = function() {
+        if (brAnimFrameId) cancelAnimationFrame(brAnimFrameId);
+        if (brRenderer && brRenderer.domElement) {
+          brRenderer.domElement.remove();
+        }
+        brInitialized = false;
+      };
+    }
+
+    // ============================================================
+    // ARENA MODE (Imported from provided code with adjustments)
+    // ============================================================
+    let arenaInitialized = false;
+    let arenaScene, arenaCamera, arenaRenderer;
+    let arenaPlayer, arenaPlayerBody;
+    let arenaZombies = [];
+    let arenaBullets = [];
+    let arenaMapSize = 80;
+    let arenaKills = 0;
+    let arenaAmmo = 30;
+    let arenaMaxAmmo = 30;
+    let arenaIsReloading = false;
+    let arenaHealth = 100;
+    let arenaAimTarget3D = new THREE.Vector3();
+    let arenaMoveForward = 0, arenaMoveSide = 0;
+    let arenaJoystickActive = false, arenaJoystickTouchId = null;
+    let arenaTouchLookId = null, arenaPrevTouchX = 0, arenaPrevTouchY = 0;
+    let arenaCameraYaw = 0, arenaCameraPitch = 0;
+    let arenaAnimFrameId = null;
+    let arenaZombieSpawnTimer = 0;
+
+    function initArena() {
+      if (arenaInitialized) return;
+      arenaInitialized = true;
+
+      const container = document.getElementById('canvas-container');
+      
+      arenaScene = new THREE.Scene();
+      arenaScene.background = new THREE.Color(0x11111a);
+      arenaScene.fog = new THREE.FogExp2(0x11111a, 0.02);
+
+      arenaCamera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+      arenaRenderer = new THREE.WebGLRenderer({ antialias: true });
+      arenaRenderer.setSize(window.innerWidth, window.innerHeight);
+      arenaRenderer.shadowMap.enabled = true;
+      container.appendChild(arenaRenderer.domElement);
+
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+      arenaScene.add(ambientLight);
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      dirLight.position.set(20, 40, 20);
+      dirLight.castShadow = true;
+      arenaScene.add(dirLight);
+
+      // Ground
+      const groundGeo = new THREE.PlaneGeometry(arenaMapSize, arenaMapSize);
+      const groundMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
+      const ground = new THREE.Mesh(groundGeo, groundMat);
+      ground.rotation.x = -Math.PI / 2;
+      ground.receiveShadow = true;
+      arenaScene.add(ground);
+
+      const grid = new THREE.GridHelper(arenaMapSize, 20, 0xff0000, 0x444444);
+      grid.position.y = 0.01;
+      arenaScene.add(grid);
+
+      // Arena walls (invisible colliders)
+      // Just add boundary colliders logic in update
+
+      // Create Player
+      createArenaPlayer();
+
+      // Spawn Initial Zombies
+      for (let i = 0; i < 6; i++) {
+        spawnArenaZombie();
+      }
+
+      // Setup Arena UI
+      setupArenaUI();
+
+      // Start Loop
+      arenaAnimate();
+
+      window.addEventListener('resize', onArenaWindowResize);
+    }
+
+    function createArenaPlayer() {
+      arenaPlayer = new THREE.Group();
+      const bodyGeo = new THREE.CylinderGeometry(0.5, 0.5, 1.8, 16);
+      const bodyMat = new THREE.MeshStandardMaterial({ color: 0x2196F3 });
+      arenaPlayerBody = new THREE.Mesh(bodyGeo, bodyMat);
+      arenaPlayerBody.position.y = 0.9;
+      arenaPlayerBody.castShadow = true;
+      arenaPlayer.add(arenaPlayerBody);
+
+      const gunGeo = new THREE.BoxGeometry(0.15, 0.15, 0.6);
+      const gunMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+      const gun = new THREE.Mesh(gunGeo, gunMat);
+      gun.position.set(0.3, 1.2, 0.4);
+      arenaPlayer.add(gun);
+
+      arenaPlayer.position.set(0, 0, 0);
+      arenaScene.add(arenaPlayer);
+    }
+
+    function spawnArenaZombie() {
+      const zombie = new THREE.Group();
+      const bodyGeo = new THREE.CylinderGeometry(0.5, 0.5, 1.8, 16);
+      const bodyMat = new THREE.MeshStandardMaterial({ color: 0x4CAF50 });
+      const mesh = new THREE.Mesh(bodyGeo, bodyMat);
+      mesh.position.y = 0.9;
+      mesh.castShadow = true;
+      zombie.add(mesh);
+
+      const headGeo = new THREE.SphereGeometry(0.3, 8, 8);
+      const headMat = new THREE.MeshStandardMaterial({ color: 0x388E3C });
+      const head = new THREE.Mesh(headGeo, headMat);
+      head.position.y = 1.8;
+      zombie.add(head);
+
+      let x, z;
+      const halfMap = arenaMapSize / 2 - 2;
+      do {
+        x = (Math.random() - 0.5) * (arenaMapSize - 6);
+        z = (Math.random() - 0.5) * (arenaMapSize - 6);
+      } while (Math.hypot(x, z) < 8);
+
+      zombie.position.set(x, 0, z);
+      arenaScene.add(zombie);
+
+      arenaZombies.push({
+        mesh: zombie,
+        health: 100,
+        speed: 0.03 + Math.random() * 0.03
+      });
+
+      updateArenaStats();
+    }
+
+    function setupArenaUI() {
+      // Create arena UI elements dynamically or use existing ones
+      // We'll reuse the same UI but with arena-specific updates
+      // Add arena overlay if needed
+      const arenaContainer = document.getElementById('arena-container');
+      arenaContainer.style.display = 'block';
+      arenaContainer.innerHTML = `
+        <div id="arena-stats-panel" style="position:absolute; top:170px; left:15px; background:rgba(0,0,0,0.65); padding:10px 15px; border-radius:8px; border-left:4px solid #ff4444; color:white; font-size:14px; font-weight:bold; display:flex; flex-direction:column; gap:6px; z-index:10;">
+          <div class="stat-item">Kills: <span id="arena-kills-val" style="color:#ffeb3b;">0</span></div>
+          <div class="stat-item">Zombies Alive: <span id="arena-alive-val" style="color:#ffeb3b;">0</span></div>
+          <div class="stat-item">Ammo: <span id="arena-ammo-val" style="color:#ffeb3b;">30 / ∞</span></div>
+        </div>
+        <div id="arena-aim-reticle" style="position:absolute; width:20px; height:20px; border:2px solid rgba(255,50,50,0.8); border-radius:50%; pointer-events:none; transform:translate(-50%,-50%); z-index:8; box-shadow:0 0 4px #ff0000;"></div>
+        <div id="arena-health-container" style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:200px; height:16px; background:rgba(0,0,0,0.6); border:2px solid #fff; border-radius:10px; overflow:hidden; z-index:10;">
+          <div id="arena-health-bar" style="width:100%; height:100%; background:#4CAF50; transition:width 0.2s;"></div>
+        </div>
+        <button id="arena-fire-btn" style="position:absolute; bottom:30px; right:30px; width:80px; height:80px; background:rgba(255,50,50,0.4); border:2px solid rgba(255,100,100,0.8); border-radius:50%; color:white; font-weight:bold; font-size:18px; z-index:10; touch-action:manipulation;">FIRE</button>
+        <button id="arena-reload-btn" style="position:absolute; bottom:120px; right:40px; width:55px; height:55px; background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.5); border-radius:50%; color:white; font-weight:bold; font-size:12px; z-index:10; touch-action:manipulation;">RELOAD</button>
+        <div id="arena-joystick-zone" style="position:absolute; bottom:30px; left:30px; width:120px; height:120px; background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.2); border-radius:50%; z-index:10;">
+          <div id="arena-joystick-knob" style="position:absolute; top:35px; left:35px; width:50px; height:50px; background:rgba(255,255,255,0.4); border-radius:50%;"></div>
+        </div>
+      `;
+
+      // Arena controls
+      document.getElementById('arena-fire-btn').addEventListener('touchstart', (e) => { e.preventDefault(); arenaShoot(); });
+      document.getElementById('arena-reload-btn').addEventListener('touchstart', (e) => { e.preventDefault(); arenaReload(); });
+
+      // Arena joystick
+      const joyZone = document.getElementById('arena-joystick-zone');
+      const joyKnob = document.getElementById('arena-joystick-knob');
+      const joyRadius = 60;
+
+      joyZone.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.changedTouches[0];
+        arenaJoystickTouchId = touch.identifier;
+        arenaJoystickActive = true;
+        updateArenaJoystick(touch);
+      }, { passive: false });
+
+      window.addEventListener('touchmove', (e) => {
+        for (let touch of e.changedTouches) {
+          if (touch.identifier === arenaJoystickTouchId) {
+            updateArenaJoystick(touch);
+          } else if (touch.identifier === arenaTouchLookId) {
+            const deltaX = touch.clientX - arenaPrevTouchX;
+            const deltaY = touch.clientY - arenaPrevTouchY;
+            arenaCameraYaw -= deltaX * 0.005;
+            arenaCameraPitch -= deltaY * 0.005;
+            arenaCameraPitch = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, arenaCameraPitch));
+            arenaPrevTouchX = touch.clientX;
+            arenaPrevTouchY = touch.clientY;
+          }
+        }
+      }, { passive: false });
+
+      window.addEventListener('touchend', (e) => {
+        for (let touch of e.changedTouches) {
+          if (touch.identifier === arenaJoystickTouchId) {
+            arenaJoystickActive = false;
+            arenaJoystickTouchId = null;
+            arenaMoveForward = 0;
+            arenaMoveSide = 0;
+            joyKnob.style.transform = `translate(0px, 0px)`;
+          } else if (touch.identifier === arenaTouchLookId) {
+            arenaTouchLookId = null;
+          }
+        }
+      });
+
+      // Camera look on right side
+      window.addEventListener('touchstart', (e) => {
+        for (let touch of e.changedTouches) {
+          if (touch.clientX > window.innerWidth / 2 && arenaTouchLookId === null) {
+            const target = e.target;
+            if (target.id !== 'arena-fire-btn' && target.id !== 'arena-reload-btn' && target.id !== 'arena-joystick-zone') {
+              arenaTouchLookId = touch.identifier;
+              arenaPrevTouchX = touch.clientX;
+              arenaPrevTouchY = touch.clientY;
+            }
+          }
+        }
+      });
+    }
+
+    function updateArenaJoystick(touch) {
+      const rect = document.getElementById('arena-joystick-zone').getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      let dx = touch.clientX - centerX;
+      let dy = touch.clientY - centerY;
+      const dist = Math.hypot(dx, dy);
+      const joyRadius = 60;
+      if (dist > joyRadius) {
+        dx = (dx / dist) * joyRadius;
+        dy = (dy / dist) * joyRadius;
+      }
+      document.getElementById('arena-joystick-knob').style.transform = `translate(${dx}px, ${dy}px)`;
+      arenaMoveSide = dx / joyRadius;
+      arenaMoveForward = -dy / joyRadius;
+    }
+
+    function arenaShoot() {
+      if (arenaIsReloading) return;
+      if (arenaAmmo <= 0) {
+        arenaReload();
+        return;
+      }
+      arenaAmmo--;
+      updateArenaStats();
+
+      const bulletGeo = new THREE.SphereGeometry(0.15, 8, 8);
+      const bulletMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+      const bullet = new THREE.Mesh(bulletGeo, bulletMat);
+
+      const spawnPos = arenaPlayer.position.clone();
+      spawnPos.y = 1.3;
+      bullet.position.copy(spawnPos);
+
+      const dir = new THREE.Vector3().subVectors(arenaAimTarget3D, spawnPos).normalize();
+
+      arenaBullets.push({
+        mesh: bullet,
+        direction: dir,
+        life: 100
+      });
+      arenaScene.add(bullet);
+    }
+
+    function arenaReload() {
+      if (arenaIsReloading || arenaAmmo === arenaMaxAmmo) return;
+      arenaIsReloading = true;
+      document.getElementById('arena-ammo-val').innerText = "Reloading...";
+      setTimeout(() => {
+        arenaAmmo = arenaMaxAmmo;
+        arenaIsReloading = false;
+        updateArenaStats();
+      }, 1500);
+    }
+
+    function updateArenaStats() {
+      document.getElementById('arena-kills-val').innerText = arenaKills;
+      document.getElementById('arena-alive-val').innerText = arenaZombies.length;
+      if (!arenaIsReloading) {
+        document.getElementById('arena-ammo-val').innerText = `${arenaAmmo} / ∞`;
+      }
+    }
+
+    function arenaAnimate() {
+      arenaAnimFrameId = requestAnimationFrame(arenaAnimate);
+
+      updateArenaPlayer();
+      updateArenaCameraAndAim();
+      updateArenaBullets();
+      updateArenaZombies();
+      renderArenaMinimap();
+
+      arenaRenderer.render(arenaScene, arenaCamera);
+    }
+
+    function updateArenaPlayer() {
+      if (arenaMoveForward !== 0 || arenaMoveSide !== 0) {
+        const moveAngle = Math.atan2(arenaMoveSide, arenaMoveForward) + arenaCameraYaw;
+        const speed = 0.12;
+        arenaPlayer.position.x -= Math.sin(moveAngle) * speed;
+        arenaPlayer.position.z -= Math.cos(moveAngle) * speed;
+        arenaPlayer.rotation.y = moveAngle + Math.PI;
+
+        const limit = arenaMapSize / 2 - 1;
+        arenaPlayer.position.x = Math.max(-limit, Math.min(limit, arenaPlayer.position.x));
+        arenaPlayer.position.z = Math.max(-limit, Math.min(limit, arenaPlayer.position.z));
+      }
+    }
+
+    function updateArenaCameraAndAim() {
+      const camDistance = 4.5;
+      const camHeight = 2.2;
+
+      const camX = arenaPlayer.position.x + camDistance * Math.sin(arenaCameraYaw) * Math.cos(arenaCameraPitch);
+      const camY = arenaPlayer.position.y + camHeight + camDistance * Math.sin(arenaCameraPitch);
+      const camZ = arenaPlayer.position.z + camDistance * Math.cos(arenaCameraYaw) * Math.cos(arenaCameraPitch);
+
+      arenaCamera.position.set(camX, camY, camZ);
+
+      // FIXED AIM: always at zombie chest height (y=1.3)
+      const aimDistance = 15;
+      arenaAimTarget3D.x = arenaPlayer.position.x - aimDistance * Math.sin(arenaCameraYaw);
+      arenaAimTarget3D.y = 1.3;
+      arenaAimTarget3D.z = arenaPlayer.position.z - aimDistance * Math.cos(arenaCameraYaw);
+
+      arenaCamera.lookAt(arenaAimTarget3D);
+
+      // Project aim to UI reticle
+      const projectedAim = arenaAimTarget3D.clone().project(arenaCamera);
+      const x = (projectedAim.x * 0.5 + 0.5) * window.innerWidth;
+      const y = (-(projectedAim.y * 0.5) + 0.5) * window.innerHeight;
+
+      const reticle = document.getElementById('arena-aim-reticle');
+      if (reticle) {
+        reticle.style.left = `${x}px`;
+        reticle.style.top = `${y}px`;
+      }
+    }
+
+    function updateArenaBullets() {
+      for (let i = arenaBullets.length - 1; i >= 0; i--) {
+        const b = arenaBullets[i];
+        b.mesh.position.addScaledVector(b.direction, 0.8);
+        b.life--;
+
+        let bulletRemoved = false;
+        for (let j = arenaZombies.length - 1; j >= 0; j--) {
+          const z = arenaZombies[j];
+          const dist = b.mesh.position.distanceTo(z.mesh.position.clone().setY(0.9));
+          if (dist < 0.8) {
+            z.health -= 50;
+            arenaScene.remove(b.mesh);
+            arenaBullets.splice(i, 1);
+            bulletRemoved = true;
+            if (z.health <= 0) {
+              arenaScene.remove(z.mesh);
+              arenaZombies.splice(j, 1);
+              arenaKills++;
+              updateArenaStats();
+              // Respawn zombie after delay
+              setTimeout(spawnArenaZombie, 500);
+            }
+            break;
+          }
+        }
+        if (!bulletRemoved && b.life <= 0) {
+          arenaScene.remove(b.mesh);
+          arenaBullets.splice(i, 1);
+        }
+      }
+    }
+
+    function updateArenaZombies() {
+      arenaZombies.forEach((z) => {
+        const dir = new THREE.Vector3().subVectors(arenaPlayer.position, z.mesh.position);
+        dir.y = 0;
+        dir.normalize();
+
+        z.mesh.position.addScaledVector(dir, z.speed);
+        z.mesh.lookAt(arenaPlayer.position.x, z.mesh.position.y, arenaPlayer.position.z);
+
+        const dist = arenaPlayer.position.distanceTo(z.mesh.position);
+        if (dist < 1.0) {
+          arenaHealth -= 0.2;
+          document.getElementById('arena-health-bar').style.width = `${Math.max(0, arenaHealth)}%`;
+          if (arenaHealth <= 0) {
+            // Game Over
+            alert("Game Over! Kills: " + arenaKills);
+            backToLobby();
+          }
+        }
+      });
+    }
+
+    function renderArenaMinimap() {
+      const canvas = document.getElementById('minimap-canvas');
+      const ctx = miniCtx;
+      ctx.clearRect(0, 0, 70, 70);
+      const mapScale = 70 / arenaMapSize;
+      const center = 35;
+
+      // Player
+      const px = center + arenaPlayer.position.x * mapScale;
+      const pz = center + arenaPlayer.position.z * mapScale;
+      ctx.fillStyle = '#2196F3';
+      ctx.beginPath();
+      ctx.arc(px, pz, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Zombies
+      ctx.fillStyle = '#ff3333';
+      arenaZombies.forEach(z => {
+        const zx = center + z.mesh.position.x * mapScale;
+        const zz = center + z.mesh.position.z * mapScale;
+        ctx.beginPath();
+        ctx.arc(zx, zz, 2, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function onArenaWindowResize() {
+      if (!arenaRenderer) return;
+      arenaCamera.aspect = window.innerWidth / window.innerHeight;
+      arenaCamera.updateProjectionMatrix();
+      arenaRenderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    window.arenaCleanup = function() {
+      if (arenaAnimFrameId) cancelAnimationFrame(arenaAnimFrameId);
+      if (arenaRenderer && arenaRenderer.domElement) {
+        arenaRenderer.domElement.remove();
+      }
+      arenaInitialized = false;
+      document.getElementById('arena-container').innerHTML = '';
+    };
+
+    // ============================================================
+    // AUDIO ENGINE (shared)
+    // ============================================================
     const AudioEngine = {
       ctx: null,
       init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); if(this.ctx.state === 'suspended') this.ctx.resume(); },
@@ -297,586 +1420,56 @@
       }
     };
 
-    // --- THREE.JS SETUP ---
-    const container = document.getElementById('canvas-container');
-    const scene = new THREE.Scene(); scene.background = new THREE.Color(0x38bdf8); scene.fog = new THREE.FogExp2(0x38bdf8, 0.0035);
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-    renderer.setSize(window.innerWidth, window.innerHeight); renderer.shadowMap.enabled = true; container.appendChild(renderer.domElement);
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    const sunLight = new THREE.DirectionalLight(0xfffbe1, 1.2); sunLight.position.set(100, 150, 50); sunLight.castShadow = true; scene.add(sunLight);
-
-    // --- WORLD CREATION ---
-    const worldSize = 800;
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(worldSize, worldSize), new THREE.MeshStandardMaterial({ color: 0x2d5a27, roughness: 0.9 }));
-    ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
-
-    const obstacleColliders = [];
-
-    // Mountains
-    for(let i = 0; i < 25; i++) {
-      const h = 30 + Math.random() * 40; const r = 18 + Math.random() * 20;
-      const m = new THREE.Mesh(new THREE.ConeGeometry(r, h, 6), new THREE.MeshStandardMaterial({ color: 0x525252, roughness: 0.8 }));
-      const x = (Math.random() - 0.5) * 700; const z = (Math.random() - 0.5) * 700;
-      m.position.set(x, h/2, z); scene.add(m);
-      obstacleColliders.push({ type: 'cylinder', x: x, z: z, radius: r * 0.75 });
-    }
-
-    // Trees
-    for(let i = 0; i < 140; i++) {
-      const tree = new THREE.Group();
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.7, 3.5), new THREE.MeshStandardMaterial({ color: 0x543d2b }));
-      trunk.position.y = 1.75; tree.add(trunk);
-      const leaves = new THREE.Mesh(new THREE.ConeGeometry(2.5 + Math.random(), 5, 6), new THREE.MeshStandardMaterial({ color: 0x15803d }));
-      leaves.position.y = 5; tree.add(leaves);
-      const x = (Math.random() - 0.5) * 650; const z = (Math.random() - 0.5) * 650;
-      tree.position.set(x, 0, z); scene.add(tree);
-      obstacleColliders.push({ type: 'cylinder', x: x, z: z, radius: 1.2 });
-    }
-
-    // Roads
-    const roadMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.6 });
-    const mainRoad = new THREE.Mesh(new THREE.PlaneGeometry(16, worldSize), roadMat);
-    mainRoad.rotation.x = -Math.PI / 2; mainRoad.position.y = 0.02; scene.add(mainRoad);
-
-    // Ammo Crates & Health Packs
-    const lootCrates = [];
-    const healthPacks = [];
-
-    function spawnLootCrate(x, z) {
-      const group = new THREE.Group();
-      const ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.9, 24), new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xf97316, emissiveIntensity: 0.3, side: THREE.DoubleSide }));
-      ring.rotation.x = -Math.PI / 2; ring.position.y = 1.2; group.add(ring);
-      const glow = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xf97316, emissiveIntensity: 0.5 }));
-      glow.position.y = 1.2; group.add(glow);
-      group.position.set(x, 0, z); scene.add(group);
-      lootCrates.push(group);
-    }
-
-    function spawnHealthPack(x, z) {
-      const group = new THREE.Group();
-      const box = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.6), new THREE.MeshStandardMaterial({ color: 0xffffff }));
-      box.position.y = 0.5; group.add(box);
-      const crossHorizontal = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.42, 0.12), new THREE.MeshStandardMaterial({ color: 0xef4444 }));
-      crossHorizontal.position.y = 0.51; group.add(crossHorizontal);
-      const crossVertical = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.42, 0.4), new THREE.MeshStandardMaterial({ color: 0xef4444 }));
-      crossVertical.position.y = 0.51; group.add(crossVertical);
-      group.position.set(x, 0, z); scene.add(group);
-      healthPacks.push(group);
-    }
-
-    for(let i = 0; i < 35; i++) {
-      spawnLootCrate((Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500);
-    }
-
-    // Vehicles
-    const vehicles = [];
-    function createVehicle(x, z, color) {
-      const g = new THREE.Group();
-      const body = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.2, 4.5), new THREE.MeshStandardMaterial({ color: color || 0xd97706 }));
-      body.position.y = 0.8; g.add(body);
-      const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.9, 2.4), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
-      cabin.position.set(0, 1.7, -0.2); g.add(cabin);
-      g.position.set(x, 0, z); scene.add(g);
-      g.userData = { speed: 0, steerAngle: 0, radius: 2.2 };
-      vehicles.push(g); return g;
-    }
-    const car1 = createVehicle(12, 15, 0xd97706);
-    const car2 = createVehicle(-40, -50, 0x2563eb);
-    let activeVehicle = null;
-
-    // Player Character Construction
-    const characterGroup = new THREE.Group(); scene.add(characterGroup);
-    const bodyMeshGroup = new THREE.Group(); characterGroup.add(bodyMeshGroup);
-    
-    const torso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), new THREE.MeshStandardMaterial({ color: 0x0284c7 }));
-    torso.position.y = 1.4; bodyMeshGroup.add(torso);
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), new THREE.MeshStandardMaterial({ color: 0xffdbac }));
-    head.position.y = 2.25; bodyMeshGroup.add(head);
-    const gunMesh = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.85), new THREE.MeshStandardMaterial({ color: 0x0f172a }));
-    gunMesh.position.set(0.38, 1.35, -0.4); bodyMeshGroup.add(gunMesh);
-
-    // Player State
-    const player = {
-      hp: 100, kills: 0, ammo: 30, reserveAmmo: 120, maxClip: 30,
-      speed: 0.7, yVelocity: 0, grounded: true, mode: 'stand'
-    };
-    const TOTAL_ZOMBIES = 50;
-    let zombiesRemaining = TOTAL_ZOMBIES;
-    let isGameStarted = false;
-
-    // Zombies Array
-    const zombies = [];
-    function createHealthBarCanvas() {
-      const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 12;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0, 0, 64, 12);
-      ctx.fillStyle = '#ef4444'; ctx.fillRect(2, 2, 60, 8);
-      const texture = new THREE.CanvasTexture(canvas);
-      const spriteMat = new THREE.SpriteMaterial({ map: texture });
-      const sprite = new THREE.Sprite(spriteMat);
-      sprite.scale.set(1.5, 0.3, 1); sprite.position.y = 2.6;
-      return { sprite, canvas, ctx, texture };
-    }
-
-    function updateZombieHealthBar(z) {
-      const pct = Math.max(0, z.userData.hp / 100);
-      const ctx = z.userData.hb.ctx;
-      ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0, 0, 64, 12);
-      ctx.fillStyle = '#ef4444'; ctx.fillRect(2, 2, 60 * pct, 8);
-      z.userData.hb.texture.needsUpdate = true;
-    }
-
-    function spawnZombie() {
-      const g = new THREE.Group();
-      const zMat = new THREE.MeshStandardMaterial({ color: 0x16a34a });
-      const zTorso = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.5), zMat); zTorso.position.y = 1.2; g.add(zTorso);
-      const zHead = new THREE.Mesh(new THREE.SphereGeometry(0.35, 12, 12), new THREE.MeshStandardMaterial({ color: 0x15803d })); zHead.position.y = 2.0; g.add(zHead);
-      
-      const hb = createHealthBarCanvas(); g.add(hb.sprite);
-      
-      const angle = Math.random() * Math.PI * 2; const dist = 35 + Math.random() * 45;
-      g.position.set(characterGroup.position.x + Math.cos(angle)*dist, 0, characterGroup.position.z + Math.sin(angle)*dist);
-      g.userData = { hp: 100, speed: 0.12, hb: hb, radius: 0.8 };
-      scene.add(g); zombies.push(g);
-    }
-    for(let i = 0; i < 12; i++) spawnZombie();
-
-    // --- SMOOTH CAMERA & TOUCH SWIPE CONTROLS ---
-    let targetYaw = 0, targetPitch = 0.05;
-    let cameraAngleYaw = 0, cameraAnglePitch = 0.05;
-    let isSwiping = false, activeTouchId = null, lastTX = 0, lastTY = 0;
-
-    window.addEventListener('touchstart', (e) => {
-      if(!isGameStarted) return;
-      for(let t of e.changedTouches) {
-        if(t.clientX > window.innerWidth / 3 && activeTouchId === null) {
-          isSwiping = true;
-          activeTouchId = t.identifier;
-          lastTX = t.clientX;
-          lastTY = t.clientY;
-        }
-      }
-    });
-
-    window.addEventListener('touchmove', (e) => {
-      if(!isSwiping || !isGameStarted) return;
-      for(let t of e.changedTouches) {
-        if(t.identifier === activeTouchId) {
-          const dx = t.clientX - lastTX;
-          const dy = t.clientY - lastTY;
-          
-          targetYaw -= dx * 0.004;
-          targetPitch -= dy * 0.003;
-          targetPitch = Math.max(-0.25, Math.min(Math.PI / 3, targetPitch));
-          
-          lastTX = t.clientX;
-          lastTY = t.clientY;
-        }
-      }
-    }, { passive: false });
-
-    window.addEventListener('touchend', (e) => {
-      for(let t of e.changedTouches) {
-        if(t.identifier === activeTouchId) {
-          isSwiping = false;
-          activeTouchId = null;
-        }
-      }
-    });
-
-    // Joystick Control
-    let joystickInput = { x: 0, y: 0 };
-    const joyCont = document.getElementById('joystick-container');
-    const joyKnob = document.getElementById('joystick-knob');
-    let joyActive = false, joyOrigin = { x: 0, y: 0 };
-
-    joyCont.addEventListener('touchstart', (e) => {
-      if(!isGameStarted) return;
-      const t = e.touches[0]; const rect = joyCont.getBoundingClientRect();
-      joyOrigin = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-      joyActive = true;
-    });
-    window.addEventListener('touchmove', (e) => {
-      if(!joyActive) return;
-      const t = e.touches[0]; const dx = t.clientX - joyOrigin.x; const dy = t.clientY - joyOrigin.y;
-      const dist = Math.min(Math.hypot(dx, dy), 40); const ang = Math.atan2(dy, dx);
-      joyKnob.style.transform = `translate(calc(-50% + ${Math.cos(ang)*dist}px), calc(-50% + ${Math.sin(ang)*dist}px))`;
-      joystickInput.x = Math.cos(ang) * (dist / 40);
-      joystickInput.y = -Math.sin(ang) * (dist / 40);
-    });
-    window.addEventListener('touchend', () => {
-      joyActive = false; joyKnob.style.transform = 'translate(-50%, -50%)';
-      joystickInput = { x: 0, y: 0 };
-    });
-
-    // --- SHOOTING & BULLETS ---
-    const bullets = [];
-    function shoot() {
-      if(!isGameStarted || activeVehicle || player.ammo <= 0) return;
-      player.ammo--; updateHUD();
-      AudioEngine.playGunshot();
-
-      const b = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0xfacc15 }));
-      
-      let gunWorldPos = new THREE.Vector3();
-      gunMesh.getWorldPosition(gunWorldPos);
-      b.position.copy(gunWorldPos);
-      
-      const dir = new THREE.Vector3(); 
-      camera.getWorldDirection(dir);
-      b.velocity = dir.multiplyScalar(3.2); 
-      scene.add(b); bullets.push(b);
-    }
-
-    // --- BUTTON EVENT LISTENERS ---
-    document.getElementById('btn-fire').addEventListener('touchstart', (e) => { e.preventDefault(); shoot(); });
-    
-    // Jump Button - Accelerated Jump Speed
-    document.getElementById('btn-jump').addEventListener('touchstart', (e) => { 
-      e.preventDefault(); 
-      if(player.grounded) { 
-        player.yVelocity = 0.42;
-        player.grounded = false; 
-        player.mode = 'stand';
-        updateCharacterPose();
-      } 
-    });
-
-    // Sit Button
-    document.getElementById('btn-sit').addEventListener('touchstart', (e) => { 
-      e.preventDefault(); 
-      player.mode = (player.mode === 'sit') ? 'stand' : 'sit';
-      updateCharacterPose();
-    });
-
-    // Lie Button
-    document.getElementById('btn-lie').addEventListener('touchstart', (e) => { 
-      e.preventDefault(); 
-      player.mode = (player.mode === 'lie') ? 'stand' : 'lie';
-      updateCharacterPose();
-    });
-
-    // Magazine Reload Button
-    document.getElementById('btn-reload').addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      const needed = player.maxClip - player.ammo;
-      if(needed > 0 && player.reserveAmmo > 0) {
-        const reloadAmount = Math.min(needed, player.reserveAmmo);
-        player.ammo += reloadAmount; 
-        player.reserveAmmo -= reloadAmount; 
-        updateHUD();
-      }
-    });
-
-    function updateCharacterPose() {
-      document.getElementById('btn-sit').classList.toggle('active', player.mode === 'sit');
-      document.getElementById('btn-lie').classList.toggle('active', player.mode === 'lie');
-
-      if (player.mode === 'sit') {
-        bodyMeshGroup.scale.set(1, 0.65, 1);
-        bodyMeshGroup.rotation.x = 0;
-        bodyMeshGroup.position.y = 0;
-        player.speed = 0.35;
-      } else if (player.mode === 'lie') {
-        bodyMeshGroup.scale.set(1, 1, 1);
-        bodyMeshGroup.rotation.x = -Math.PI / 2.2;
-        bodyMeshGroup.position.y = 0.35;
-        player.speed = 0.2;
-      } else { // Stand
-        bodyMeshGroup.scale.set(1, 1, 1);
-        bodyMeshGroup.rotation.x = 0;
-        bodyMeshGroup.position.y = 0;
-        player.speed = 0.7;
+    // ============================================================
+    // GAME INITIALIZATION
+    // ============================================================
+    function initGame() {
+      if (currentMode === 'battle-royale') {
+        // Hide arena container
+        document.getElementById('arena-container').style.display = 'none';
+        // Show BR UI
+        topLeftHud.style.display = 'flex';
+        crosshair.style.display = 'block';
+        uiLayer.style.display = 'block';
+        lobbyScreen.style.display = 'none';
+        isGameStarted = true;
+        initBattleRoyale();
+      } else if (currentMode === 'arena') {
+        // Hide BR UI
+        topLeftHud.style.display = 'none';
+        crosshair.style.display = 'none';
+        uiLayer.style.display = 'none';
+        lobbyScreen.style.display = 'none';
+        isGameStarted = true;
+        initArena();
       }
     }
 
-    // Vehicle Boarding
-    const btnVeh = document.getElementById('btn-vehicle-enter');
-    btnVeh.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      if(!activeVehicle) {
-        let nearest = null, minDist = Infinity;
-        vehicles.forEach(v => { const d = characterGroup.position.distanceTo(v.position); if(d < minDist) { minDist = d; nearest = v; } });
-        if(nearest && minDist < 5) {
-          activeVehicle = nearest; characterGroup.visible = false;
-          document.getElementById('veh-btn-text').innerText = "EXIT";
-          toggleCarControls(true);
-        }
-      } else {
-        characterGroup.position.set(activeVehicle.position.x + 2.5, 0, activeVehicle.position.z);
-        characterGroup.visible = true; activeVehicle = null;
-        document.getElementById('veh-btn-text').innerText = "ENTER";
-        toggleCarControls(false);
-      }
-    });
-
-    function toggleCarControls(inCar) {
-      document.getElementById('car-ui-left').style.display = inCar ? 'flex' : 'none';
-      document.getElementById('car-ui-right').style.display = inCar ? 'flex' : 'none';
-      document.getElementById('btn-fire').style.display = inCar ? 'none' : 'flex';
-      document.getElementById('btn-jump').style.display = inCar ? 'none' : 'flex';
-      document.getElementById('btn-sit').style.display = inCar ? 'none' : 'flex';
-      document.getElementById('btn-lie').style.display = inCar ? 'none' : 'flex';
-      document.getElementById('btn-reload').style.display = inCar ? 'none' : 'flex';
-      document.getElementById('joystick-container').style.display = inCar ? 'none' : 'block';
-    }
-
-    // Car Controls
-    let carInput = { gas: 0, steer: 0 };
-    document.getElementById('btn-car-forward').addEventListener('touchstart', (e) => { e.preventDefault(); carInput.gas = 1.2; });
-    document.getElementById('btn-car-forward').addEventListener('touchend', () => carInput.gas = 0);
-    document.getElementById('btn-car-backward').addEventListener('touchstart', (e) => { e.preventDefault(); carInput.gas = -0.6; });
-    document.getElementById('btn-car-backward').addEventListener('touchend', () => carInput.gas = 0);
-    document.getElementById('btn-car-brake').addEventListener('touchstart', (e) => { e.preventDefault(); carInput.gas = 0; if(activeVehicle) activeVehicle.userData.speed = 0; });
-    document.getElementById('btn-car-left').addEventListener('touchstart', (e) => { e.preventDefault(); carInput.steer = 0.06; });
-    document.getElementById('btn-car-left').addEventListener('touchend', () => carInput.steer = 0);
-    document.getElementById('btn-car-right').addEventListener('touchstart', (e) => { e.preventDefault(); carInput.steer = -0.06; });
-    document.getElementById('btn-car-right').addEventListener('touchend', () => carInput.steer = 0);
-
-    // Map Modal
-    const fullMapModal = document.getElementById('fullmap-modal');
-    document.getElementById('minimap-container').addEventListener('click', () => { fullMapModal.style.display = 'flex'; renderFullMap(); });
-    document.getElementById('btn-close-fullmap').addEventListener('click', () => fullMapModal.style.display = 'none');
-    document.getElementById('btn-exit').addEventListener('click', () => backToLobby());
-
-    // Radar Map
-    const miniCanvas = document.getElementById('minimap-canvas'); const miniCtx = miniCanvas.getContext('2d');
-    function drawRadarMap(ctx, w, h, scale) {
-      ctx.clearRect(0, 0, w, h); const cx = w/2, cy = h/2;
-      ctx.fillStyle = '#2d5a27'; ctx.fillRect(0,0,w,h);
-      ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#ef4444';
-      zombies.forEach(z => {
-        const dx = (z.position.x - characterGroup.position.x) * scale;
-        const dz = (z.position.z - characterGroup.position.z) * scale;
-        if(Math.hypot(dx, dz) < w / 2) {
-          ctx.beginPath(); ctx.arc(cx + dx, cy + dz, 3, 0, Math.PI * 2); ctx.fill();
-        }
-      });
-    }
-
-    function renderFullMap() {
-      const canvas = document.getElementById('fullmap-canvas'); canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-      drawRadarMap(canvas.getContext('2d'), canvas.width, canvas.height, 0.7);
-    }
-
-    // Game Flow
-    document.getElementById('btn-start-game').addEventListener('click', () => {
-      isGameStarted = true;
-      document.getElementById('lobby-screen').style.display = 'none';
-      document.getElementById('ui-layer').style.display = 'block';
-      document.getElementById('top-left-hud').style.display = 'flex';
-      document.getElementById('crosshair').style.display = 'block';
-      updateHUD();
-    });
-
-    function updateHUD() {
-      document.getElementById('hud-alive').innerText = zombiesRemaining;
-      document.getElementById('hud-kills').innerText = player.kills;
-      document.getElementById('hud-ammo').innerText = `${player.ammo}/${player.reserveAmmo}`;
-    }
-
-    function checkCollision(nextX, nextZ, radius) {
-      for(let obs of obstacleColliders) {
-        const dist = Math.hypot(nextX - obs.x, nextZ - obs.z);
-        if(dist < radius + obs.radius) return true;
-      }
-      return false;
-    }
-
-    function showVictory() {
-      isGameStarted = false; gameStats.totalKills += player.kills; saveStats();
-      document.getElementById('victory-modal').style.display = 'flex';
-    }
-
-    function showDefeat() {
-      isGameStarted = false; gameStats.totalKills += player.kills; saveStats();
-      document.getElementById('defeat-modal').style.display = 'flex';
-    }
-
-    function restartGame() { location.reload(); }
-    function backToLobby() { location.reload(); }
-
-    // --- MAIN GAME LOOP ---
-    let footstepTimer = 0;
-
-    function animate() {
-      requestAnimationFrame(animate);
-
-      if(!isGameStarted) {
-        camera.position.x = characterGroup.position.x + 5;
-        camera.position.z = characterGroup.position.z + 5;
-        camera.position.y = 2.5; camera.lookAt(characterGroup.position);
-      } else {
-        cameraAngleYaw += (targetYaw - cameraAngleYaw) * 0.15;
-        cameraAnglePitch += (targetPitch - cameraAnglePitch) * 0.15;
-
-        // Gravity and Jump physics
-        if(!player.grounded) {
-          characterGroup.position.y += player.yVelocity;
-          player.yVelocity -= 0.032;
-          if(characterGroup.position.y <= 0) {
-            characterGroup.position.y = 0;
-            player.grounded = true;
-            player.yVelocity = 0;
-          }
-        }
-
-        // Vehicle proximity check
-        let nearVeh = false;
-        vehicles.forEach(v => { if(characterGroup.position.distanceTo(v.position) < 5) nearVeh = true; });
-        btnVeh.style.display = (nearVeh || activeVehicle) ? 'flex' : 'none';
-
-        // Vehicle physics
-        if(activeVehicle) {
-          activeVehicle.userData.speed = carInput.gas;
-          activeVehicle.rotation.y += carInput.steer;
-          const driveX = activeVehicle.position.x - Math.sin(activeVehicle.rotation.y) * activeVehicle.userData.speed;
-          const driveZ = activeVehicle.position.z - Math.cos(activeVehicle.rotation.y) * activeVehicle.userData.speed;
-
-          if(!checkCollision(driveX, driveZ, activeVehicle.userData.radius)) {
-            activeVehicle.position.x = driveX; activeVehicle.position.z = driveZ;
-          }
-          characterGroup.position.copy(activeVehicle.position);
-
-          for(let j = zombies.length - 1; j >= 0; j--) {
-            if(activeVehicle.position.distanceTo(zombies[j].position) < 2.5) {
-              spawnHealthPack(zombies[j].position.x, zombies[j].position.z);
-              scene.remove(zombies[j]); zombies.splice(j, 1);
-              player.kills++; zombiesRemaining--; updateHUD();
-              AudioEngine.playZombieDie();
-              if(zombiesRemaining > 0) spawnZombie(); else showVictory();
-            }
-          }
-        } else {
-          // Character movement based on Joystick & Camera Direction
-          if(Math.abs(joystickInput.x) > 0.05 || Math.abs(joystickInput.y) > 0.05) {
-            const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
-            const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
-            const moveDir = new THREE.Vector3().addScaledVector(right, joystickInput.x).addScaledVector(forward, joystickInput.y).normalize();
-
-            const nextX = characterGroup.position.x + moveDir.x * player.speed;
-            const nextZ = characterGroup.position.z + moveDir.z * player.speed;
-
-            if(!checkCollision(nextX, nextZ, 0.8)) {
-              characterGroup.position.x = nextX; 
-              characterGroup.position.z = nextZ;
-            }
-            characterGroup.rotation.y = Math.atan2(moveDir.x, moveDir.z);
-
-            footstepTimer += 0.05; if(footstepTimer > 0.2) { footstepTimer = 0; AudioEngine.playFootstep(); }
-          } else {
-            characterGroup.rotation.y = cameraAngleYaw;
-          }
-        }
-
-        // Loot & Health Collection
-        for(let i = lootCrates.length - 1; i >= 0; i--) {
-          if(characterGroup.position.distanceTo(lootCrates[i].position) < 2.0) {
-            scene.remove(lootCrates[i]); lootCrates.splice(i, 1);
-            player.reserveAmmo += 40; updateHUD(); AudioEngine.playPickup();
-          }
-        }
-
-        for(let i = healthPacks.length - 1; i >= 0; i--) {
-          if(characterGroup.position.distanceTo(healthPacks[i].position) < 2.0) {
-            scene.remove(healthPacks[i]); healthPacks.splice(i, 1);
-            player.hp = Math.min(100, player.hp + 35);
-            document.getElementById('hp-bar').style.width = player.hp + '%';
-            AudioEngine.playHeal();
-          }
-        }
-
-        // Bullets & Zombie collision handling
-        for(let i = bullets.length - 1; i >= 0; i--) {
-          const b = bullets[i]; b.position.add(b.velocity);
-          let bulletUsed = false;
-          for(let j = zombies.length - 1; j >= 0; j--) {
-            const z = zombies[j];
-            if(b.position.distanceTo(z.position) < 1.5) {
-              z.userData.hp -= 35; updateZombieHealthBar(z);
-              scene.remove(b); bullets.splice(i, 1);
-              bulletUsed = true;
-              AudioEngine.playHit();
-
-              if(z.userData.hp <= 0) {
-                AudioEngine.playZombieDie();
-                spawnHealthPack(z.position.x, z.position.z);
-                scene.remove(z);
-                zombies.splice(j, 1);
-                player.kills++; zombiesRemaining--; updateHUD();
-                if(zombiesRemaining > 0) spawnZombie(); else showVictory();
-              }
-              break;
-            }
-          }
-          if(!bulletUsed && b && b.position.distanceTo(characterGroup.position) > 100) { 
-            scene.remove(b); bullets.splice(i, 1); 
-          }
-        }
-
-        // Zombie AI Pursuit
-        const targetPos = activeVehicle ? activeVehicle.position : characterGroup.position;
-        zombies.forEach(z => {
-          const dir = new THREE.Vector3().subVectors(targetPos, z.position).normalize();
-          const zNextX = z.position.x + dir.x * z.userData.speed;
-          const zNextZ = z.position.z + dir.z * z.userData.speed;
-
-          if(!checkCollision(zNextX, zNextZ, z.userData.radius)) {
-            z.position.x = zNextX; z.position.z = zNextZ;
-          }
-          z.lookAt(targetPos.x, z.position.y, targetPos.z);
-
-          if(!activeVehicle && z.position.distanceTo(characterGroup.position) < 1.3) {
-            player.hp = Math.max(0, player.hp - 0.6);
-            document.getElementById('hp-bar').style.width = player.hp + '%';
-            AudioEngine.playHit();
-
-            if(Math.random() < 0.02) {
-              spawnHealthPack(characterGroup.position.x + (Math.random()-0.5)*3, characterGroup.position.z + (Math.random()-0.5)*3);
-            }
-
-            if(player.hp <= 0) showDefeat();
-          }
-        });
-
-        // --- CAMERA OVER-THE-SHOULDER ALIGNMENT ---
-        const activeObj = activeVehicle || characterGroup;
-        const camDist = activeVehicle ? 8.5 : 4.8; 
-        const camHeight = activeVehicle ? 3.5 : (player.mode === 'lie' ? 1.2 : (player.mode === 'sit' ? 1.6 : 2.2));
-        
-        const forwardDir = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
-        const rightDir = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), cameraAngleYaw);
-
-        const shoulderOffset = activeVehicle ? 0 : 0.85;
-
-        const targetCamX = activeObj.position.x - forwardDir.x * camDist + rightDir.x * shoulderOffset;
-        const targetCamY = activeObj.position.y + camHeight + Math.sin(cameraAnglePitch) * 2.2;
-        const targetCamZ = activeObj.position.z - forwardDir.z * camDist + rightDir.z * shoulderOffset;
-
-        camera.position.set(targetCamX, targetCamY, targetCamZ);
-
-        const lookTarget = new THREE.Vector3()
-          .copy(activeObj.position)
-          .add(rightDir.clone().multiplyScalar(shoulderOffset))
-          .add(new THREE.Vector3(0, player.mode === 'lie' ? 0.4 : 1.3, 0));
-        
-        camera.lookAt(lookTarget);
-
-        drawRadarMap(miniCtx, 70, 70, 0.8);
-      }
-
-      renderer.render(scene, camera);
-    }
-
+    // ============================================================
+    // WINDOW RESIZE HANDLER
+    // ============================================================
     window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      if (currentMode === 'battle-royale' && brRenderer) {
+        brCamera.aspect = window.innerWidth / window.innerHeight;
+        brCamera.updateProjectionMatrix();
+        brRenderer.setSize(window.innerWidth, window.innerHeight);
+      }
     });
 
-    animate();
+    // ============================================================
+    // INITIAL LOAD - SHOW LOBBY
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      lobbyScreen.style.display = 'flex';
+      topLeftHud.style.display = 'none';
+      crosshair.style.display = 'none';
+      uiLayer.style.display = 'none';
+      document.getElementById('arena-container').style.display = 'none';
+    });
+
+    // Make functions globally accessible for modal buttons
+    window.restartGame = restartGame;
+    window.backToLobby = backToLobby;
   </script>
 </body>
 </html>
