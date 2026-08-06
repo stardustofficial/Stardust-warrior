@@ -248,7 +248,7 @@
     </div>
   </div>
 
-  <!-- ARENA MODE UI CONTAINER -->
+  <!-- ARENA MODE UI CONTAINER (exact copy from the given arena code) -->
   <div id="arena-container">
     <!-- Elements will be injected by JavaScript -->
   </div>
@@ -961,33 +961,36 @@
     }
 
     // ============================================================
-    // ARENA MODE
+    // ARENA MODE - EXACT COPY FROM PROVIDED CODE
     // ============================================================
     let arenaInitialized = false;
     let arenaScene, arenaCamera, arenaRenderer;
     let arenaPlayer, arenaPlayerBody;
     let arenaZombies = [];
     let arenaBullets = [];
-    let arenaMapSize = 80;
+    let arenaMapSize = 100;
     let arenaKills = 0;
     let arenaAmmo = 30;
     let arenaMaxAmmo = 30;
     let arenaIsReloading = false;
-    let arenaHealth = 100;
+    let arenaPlayerHealth = 100;
     let arenaAimTarget3D = new THREE.Vector3();
-    let arenaMoveForward = 0, arenaMoveSide = 0;
-    let arenaJoystickActive = false, arenaJoystickTouchId = null;
-    let arenaTouchLookId = null, arenaPrevTouchX = 0, arenaPrevTouchY = 0;
-    let arenaCameraYaw = 0, arenaCameraPitch = 0;
+    let arenaMoveForward = 0;
+    let arenaMoveSide = 0;
+    let arenaJoystickActive = false;
+    let arenaJoystickTouchId = null;
+    let arenaTouchLookId = null;
+    let arenaPreviousTouchX = 0;
+    let arenaPreviousTouchY = 0;
+    let arenaCameraYaw = 0;
+    let arenaCameraPitch = 0;
     let arenaAnimFrameId = null;
-    let arenaZombieSpawnTimer = 0;
 
     function initArena() {
       if (arenaInitialized) return;
       arenaInitialized = true;
 
-      const container = document.getElementById('canvas-container');
-      
+      // Scene & Camera
       arenaScene = new THREE.Scene();
       arenaScene.background = new THREE.Color(0x11111a);
       arenaScene.fog = new THREE.FogExp2(0x11111a, 0.02);
@@ -997,15 +1000,18 @@
       arenaRenderer = new THREE.WebGLRenderer({ antialias: true });
       arenaRenderer.setSize(window.innerWidth, window.innerHeight);
       arenaRenderer.shadowMap.enabled = true;
-      container.appendChild(arenaRenderer.domElement);
+      document.getElementById('canvas-container').appendChild(arenaRenderer.domElement);
 
+      // Lighting
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
       arenaScene.add(ambientLight);
+
       const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
       dirLight.position.set(20, 40, 20);
       dirLight.castShadow = true;
       arenaScene.add(dirLight);
 
+      // Ground
       const groundGeo = new THREE.PlaneGeometry(arenaMapSize, arenaMapSize);
       const groundMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
       const ground = new THREE.Mesh(groundGeo, groundMat);
@@ -1013,25 +1019,31 @@
       ground.receiveShadow = true;
       arenaScene.add(ground);
 
+      // Grid helper for environment details
       const grid = new THREE.GridHelper(arenaMapSize, 20, 0xff0000, 0x444444);
       grid.position.y = 0.01;
       arenaScene.add(grid);
 
+      // Create Player
       createArenaPlayer();
 
-      for (let i = 0; i < 8; i++) {
+      // Spawn Initial Zombies
+      for (let i = 0; i < 6; i++) {
         spawnArenaZombie();
       }
 
-      setupArenaUI();
-
-      arenaAnimate();
-
+      // Event Listeners
+      setupArenaTouchControls();
       window.addEventListener('resize', onArenaWindowResize);
+
+      // Start Loop
+      arenaAnimate();
     }
 
     function createArenaPlayer() {
       arenaPlayer = new THREE.Group();
+
+      // Body Mesh
       const bodyGeo = new THREE.CylinderGeometry(0.5, 0.5, 1.8, 16);
       const bodyMat = new THREE.MeshStandardMaterial({ color: 0x2196F3 });
       arenaPlayerBody = new THREE.Mesh(bodyGeo, bodyMat);
@@ -1039,6 +1051,7 @@
       arenaPlayerBody.castShadow = true;
       arenaPlayer.add(arenaPlayerBody);
 
+      // Gun Mesh attached to Player
       const gunGeo = new THREE.BoxGeometry(0.15, 0.15, 0.6);
       const gunMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
       const gun = new THREE.Mesh(gunGeo, gunMat);
@@ -1051,6 +1064,8 @@
 
     function spawnArenaZombie() {
       const zombie = new THREE.Group();
+      
+      // Body
       const bodyGeo = new THREE.CylinderGeometry(0.5, 0.5, 1.8, 16);
       const bodyMat = new THREE.MeshStandardMaterial({ color: 0x4CAF50 });
       const mesh = new THREE.Mesh(bodyGeo, bodyMat);
@@ -1058,18 +1073,19 @@
       mesh.castShadow = true;
       zombie.add(mesh);
 
+      // Head (for chest/head level target reference)
       const headGeo = new THREE.SphereGeometry(0.3, 8, 8);
       const headMat = new THREE.MeshStandardMaterial({ color: 0x388E3C });
       const head = new THREE.Mesh(headGeo, headMat);
       head.position.y = 1.8;
       zombie.add(head);
 
+      // Spawn at random position outside center
       let x, z;
-      const halfMap = arenaMapSize / 2 - 2;
       do {
-        x = (Math.random() - 0.5) * (arenaMapSize - 6);
-        z = (Math.random() - 0.5) * (arenaMapSize - 6);
-      } while (Math.hypot(x, z) < 8);
+        x = (Math.random() - 0.5) * (arenaMapSize - 10);
+        z = (Math.random() - 0.5) * (arenaMapSize - 10);
+      } while (Math.hypot(x, z) < 10);
 
       zombie.position.set(x, 0, z);
       arenaScene.add(zombie);
@@ -1077,36 +1093,19 @@
       arenaZombies.push({
         mesh: zombie,
         health: 100,
-        speed: 0.04 + Math.random() * 0.03
+        speed: 0.03 + Math.random() * 0.02
       });
 
-      updateArenaStats();
+      updateArenaStatsUI();
     }
 
-    function setupArenaUI() {
-      arenaContainer.style.display = 'block';
-      arenaContainer.innerHTML = `
-        <div class="arena-stat-panel">
-          <div class="arena-stat-item">Kills: <span id="arena-kills-val" class="arena-stat-value">0</span></div>
-          <div class="arena-stat-item">Zombies Alive: <span id="arena-alive-val" class="arena-stat-value">0</span></div>
-          <div class="arena-stat-item">Ammo: <span id="arena-ammo-val" class="arena-stat-value">30 / ∞</span></div>
-        </div>
-        <div class="arena-aim-reticle" id="arena-aim-reticle"></div>
-        <div class="arena-health-container"><div class="arena-health-bar" id="arena-health-bar"></div></div>
-        <button class="arena-fire-btn" id="arena-fire-btn">FIRE</button>
-        <button class="arena-reload-btn" id="arena-reload-btn">RELOAD</button>
-        <div class="arena-joystick-zone" id="arena-joystick-zone">
-          <div class="arena-joystick-knob" id="arena-joystick-knob"></div>
-        </div>
-      `;
+    function setupArenaTouchControls() {
+      // Joystick Touch Events
+      const joystickZone = document.getElementById('arena-joystick-zone');
+      const joystickKnob = document.getElementById('arena-joystick-knob');
+      const joystickRadius = 60;
 
-      document.getElementById('arena-fire-btn').addEventListener('touchstart', (e) => { e.preventDefault(); arenaShoot(); });
-      document.getElementById('arena-reload-btn').addEventListener('touchstart', (e) => { e.preventDefault(); arenaReload(); });
-
-      const joyZone = document.getElementById('arena-joystick-zone');
-      const joyKnob = document.getElementById('arena-joystick-knob');
-
-      joyZone.addEventListener('touchstart', (e) => {
+      joystickZone.addEventListener('touchstart', (e) => {
         e.preventDefault();
         const touch = e.changedTouches[0];
         arenaJoystickTouchId = touch.identifier;
@@ -1119,13 +1118,18 @@
           if (touch.identifier === arenaJoystickTouchId) {
             updateArenaJoystick(touch);
           } else if (touch.identifier === arenaTouchLookId) {
-            const deltaX = touch.clientX - arenaPrevTouchX;
-            const deltaY = touch.clientY - arenaPrevTouchY;
+            // Camera rotation
+            const deltaX = touch.clientX - arenaPreviousTouchX;
+            const deltaY = touch.clientY - arenaPreviousTouchY;
+            
             arenaCameraYaw -= deltaX * 0.005;
             arenaCameraPitch -= deltaY * 0.005;
+
+            // Pitch limit
             arenaCameraPitch = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, arenaCameraPitch));
-            arenaPrevTouchX = touch.clientX;
-            arenaPrevTouchY = touch.clientY;
+
+            arenaPreviousTouchX = touch.clientX;
+            arenaPreviousTouchY = touch.clientY;
           }
         }
       }, { passive: false });
@@ -1137,24 +1141,37 @@
             arenaJoystickTouchId = null;
             arenaMoveForward = 0;
             arenaMoveSide = 0;
-            joyKnob.style.transform = `translate(0px, 0px)`;
+            joystickKnob.style.transform = `translate(0px, 0px)`;
           } else if (touch.identifier === arenaTouchLookId) {
             arenaTouchLookId = null;
           }
         }
       });
 
+      // Camera Look Touch Area (Right side touch)
       window.addEventListener('touchstart', (e) => {
         for (let touch of e.changedTouches) {
+          // Touch on right half of screen & not on buttons
           if (touch.clientX > window.innerWidth / 2 && arenaTouchLookId === null) {
             const target = e.target;
-            if (target.id !== 'arena-fire-btn' && target.id !== 'arena-reload-btn' && target.id !== 'arena-joystick-zone') {
+            if (target.id !== 'arena-fire-btn' && target.id !== 'arena-reload-btn') {
               arenaTouchLookId = touch.identifier;
-              arenaPrevTouchX = touch.clientX;
-              arenaPrevTouchY = touch.clientY;
+              arenaPreviousTouchX = touch.clientX;
+              arenaPreviousTouchY = touch.clientY;
             }
           }
         }
+      });
+
+      // Button Click Listeners
+      document.getElementById('arena-fire-btn').addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        arenaShoot();
+      });
+
+      document.getElementById('arena-reload-btn').addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        arenaReload();
       });
     }
 
@@ -1162,17 +1179,21 @@
       const rect = document.getElementById('arena-joystick-zone').getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
+
       let dx = touch.clientX - centerX;
       let dy = touch.clientY - centerY;
       const dist = Math.hypot(dx, dy);
-      const joyRadius = 60;
-      if (dist > joyRadius) {
-        dx = (dx / dist) * joyRadius;
-        dy = (dy / dist) * joyRadius;
+      const joystickRadius = 60;
+
+      if (dist > joystickRadius) {
+        dx = (dx / dist) * joystickRadius;
+        dy = (dy / dist) * joystickRadius;
       }
+
       document.getElementById('arena-joystick-knob').style.transform = `translate(${dx}px, ${dy}px)`;
-      arenaMoveSide = dx / joyRadius;
-      arenaMoveForward = -dy / joyRadius;
+
+      arenaMoveSide = dx / joystickRadius;
+      arenaMoveForward = -dy / joystickRadius;
     }
 
     function arenaShoot() {
@@ -1181,17 +1202,21 @@
         arenaReload();
         return;
       }
-      arenaAmmo--;
-      updateArenaStats();
 
+      arenaAmmo--;
+      updateArenaStatsUI();
+
+      // Bullet Mesh
       const bulletGeo = new THREE.SphereGeometry(0.15, 8, 8);
       const bulletMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
       const bullet = new THREE.Mesh(bulletGeo, bulletMat);
 
+      // Spawn from player chest position
       const spawnPos = arenaPlayer.position.clone();
       spawnPos.y = 1.3;
       bullet.position.copy(spawnPos);
 
+      // Calculate direction towards dynamic 3D aim target (At zombie chest/head level)
       const dir = new THREE.Vector3().subVectors(arenaAimTarget3D, spawnPos).normalize();
 
       arenaBullets.push({
@@ -1199,6 +1224,7 @@
         direction: dir,
         life: 100
       });
+
       arenaScene.add(bullet);
     }
 
@@ -1206,19 +1232,12 @@
       if (arenaIsReloading || arenaAmmo === arenaMaxAmmo) return;
       arenaIsReloading = true;
       document.getElementById('arena-ammo-val').innerText = "Reloading...";
+
       setTimeout(() => {
         arenaAmmo = arenaMaxAmmo;
         arenaIsReloading = false;
-        updateArenaStats();
+        updateArenaStatsUI();
       }, 1500);
-    }
-
-    function updateArenaStats() {
-      document.getElementById('arena-kills-val').innerText = arenaKills;
-      document.getElementById('arena-alive-val').innerText = arenaZombies.length;
-      if (!arenaIsReloading) {
-        document.getElementById('arena-ammo-val').innerText = `${arenaAmmo} / ∞`;
-      }
     }
 
     function arenaAnimate() {
@@ -1235,12 +1254,17 @@
 
     function updateArenaPlayer() {
       if (arenaMoveForward !== 0 || arenaMoveSide !== 0) {
+        // Movement direction relative to camera Yaw
         const moveAngle = Math.atan2(arenaMoveSide, arenaMoveForward) + arenaCameraYaw;
         const speed = 0.12;
+
         arenaPlayer.position.x -= Math.sin(moveAngle) * speed;
         arenaPlayer.position.z -= Math.cos(moveAngle) * speed;
+
+        // Rotate player towards movement
         arenaPlayer.rotation.y = moveAngle + Math.PI;
 
+        // Boundary Limits
         const limit = arenaMapSize / 2 - 1;
         arenaPlayer.position.x = Math.max(-limit, Math.min(limit, arenaPlayer.position.x));
         arenaPlayer.position.z = Math.max(-limit, Math.min(limit, arenaPlayer.position.z));
@@ -1248,6 +1272,7 @@
     }
 
     function updateArenaCameraAndAim() {
+      // Third Person Camera Positioning Behind Player
       const camDistance = 4.5;
       const camHeight = 2.2;
 
@@ -1257,14 +1282,16 @@
 
       arenaCamera.position.set(camX, camY, camZ);
 
-      // AIM TARGET AT ZOMBIE CHEST LEVEL (y=1.3) - FIXED
+      // --- FIX FOR AIMING HEIGHT ---
+      // Aim target positioned in front of player at Zombie Chest Level (y = 1.3)
       const aimDistance = 15;
       arenaAimTarget3D.x = arenaPlayer.position.x - aimDistance * Math.sin(arenaCameraYaw);
-      arenaAimTarget3D.y = 1.3;
+      arenaAimTarget3D.y = 1.3; // Straight torso/zombie level (Not ground)
       arenaAimTarget3D.z = arenaPlayer.position.z - aimDistance * Math.cos(arenaCameraYaw);
 
       arenaCamera.lookAt(arenaAimTarget3D);
 
+      // Project 3D aim target to 2D UI reticle
       const projectedAim = arenaAimTarget3D.clone().project(arenaCamera);
       const x = (projectedAim.x * 0.5 + 0.5) * window.innerWidth;
       const y = (-(projectedAim.y * 0.5) + 0.5) * window.innerHeight;
@@ -1282,25 +1309,30 @@
         b.mesh.position.addScaledVector(b.direction, 0.8);
         b.life--;
 
+        // Hit Detection against Zombies
         let bulletRemoved = false;
         for (let j = arenaZombies.length - 1; j >= 0; j--) {
           const z = arenaZombies[j];
           const dist = b.mesh.position.distanceTo(z.mesh.position.clone().setY(0.9));
+
           if (dist < 0.8) {
             z.health -= 50;
             arenaScene.remove(b.mesh);
             arenaBullets.splice(i, 1);
             bulletRemoved = true;
+
             if (z.health <= 0) {
               arenaScene.remove(z.mesh);
               arenaZombies.splice(j, 1);
               arenaKills++;
-              updateArenaStats();
-              setTimeout(spawnArenaZombie, 500);
+              updateArenaStatsUI();
+              // Respawn new zombie
+              setTimeout(spawnArenaZombie, 1000);
             }
             break;
           }
         }
+
         if (!bulletRemoved && b.life <= 0) {
           arenaScene.remove(b.mesh);
           arenaBullets.splice(i, 1);
@@ -1310,6 +1342,7 @@
 
     function updateArenaZombies() {
       arenaZombies.forEach((z) => {
+        // Move towards player
         const dir = new THREE.Vector3().subVectors(arenaPlayer.position, z.mesh.position);
         dir.y = 0;
         dir.normalize();
@@ -1317,11 +1350,12 @@
         z.mesh.position.addScaledVector(dir, z.speed);
         z.mesh.lookAt(arenaPlayer.position.x, z.mesh.position.y, arenaPlayer.position.z);
 
+        // Player damage collision
         const dist = arenaPlayer.position.distanceTo(z.mesh.position);
         if (dist < 1.0) {
-          arenaHealth -= 0.2;
-          document.getElementById('arena-health-bar').style.width = `${Math.max(0, arenaHealth)}%`;
-          if (arenaHealth <= 0) {
+          arenaPlayerHealth -= 0.2;
+          document.getElementById('arena-health-bar').style.width = `${Math.max(0, arenaPlayerHealth)}%`;
+          if (arenaPlayerHealth <= 0) {
             alert("Game Over! Kills: " + arenaKills);
             backToLobby();
           }
@@ -1331,30 +1365,42 @@
 
     function renderArenaMinimap() {
       const canvas = document.getElementById('minimap-canvas');
-      const ctx = miniCtx;
+      const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, 70, 70);
+
       const mapScale = 70 / arenaMapSize;
       const center = 35;
 
+      // Player position on minimap
       const px = center + arenaPlayer.position.x * mapScale;
       const pz = center + arenaPlayer.position.z * mapScale;
+
+      // Draw Player (Blue)
       ctx.fillStyle = '#2196F3';
       ctx.beginPath();
-      ctx.arc(px, pz, 3, 0, Math.PI * 2);
+      ctx.arc(px, pz, 4, 0, Math.PI * 2);
       ctx.fill();
 
+      // Draw Zombies (Red)
       ctx.fillStyle = '#ff3333';
       arenaZombies.forEach(z => {
         const zx = center + z.mesh.position.x * mapScale;
         const zz = center + z.mesh.position.z * mapScale;
         ctx.beginPath();
-        ctx.arc(zx, zz, 2, 0, Math.PI * 2);
+        ctx.arc(zx, zz, 3, 0, Math.PI * 2);
         ctx.fill();
       });
     }
 
+    function updateArenaStatsUI() {
+      document.getElementById('arena-kills-val').innerText = arenaKills;
+      document.getElementById('arena-alive-val').innerText = arenaZombies.length;
+      if (!arenaIsReloading) {
+        document.getElementById('arena-ammo-val').innerText = `${arenaAmmo} / ∞`;
+      }
+    }
+
     function onArenaWindowResize() {
-      if (!arenaRenderer) return;
       arenaCamera.aspect = window.innerWidth / window.innerHeight;
       arenaCamera.updateProjectionMatrix();
       arenaRenderer.setSize(window.innerWidth, window.innerHeight);
@@ -1371,6 +1417,52 @@
     };
 
     // ============================================================
+    // ARENA UI SETUP
+    // ============================================================
+    function setupArenaUI() {
+      arenaContainer.style.display = 'block';
+      arenaContainer.innerHTML = `
+        <div id="minimap-container" style="position:absolute; top:15px; left:15px; width:140px; height:140px; border:2px solid rgba(255,255,255,0.4); border-radius:50%; overflow:hidden; background-color:rgba(0,0,0,0.6); box-shadow:0 0 10px rgba(0,0,0,0.8); z-index:10;">
+          <canvas id="minimap" width="140" height="140"></canvas>
+        </div>
+
+        <div id="stats-panel" style="position:absolute; top:170px; left:15px; background:rgba(0,0,0,0.65); padding:10px 15px; border-radius:8px; border-left:4px solid #ff4444; color:white; font-size:14px; font-weight:bold; display:flex; flex-direction:column; gap:6px; box-shadow:0 4px 6px rgba(0,0,0,0.3); z-index:10;">
+          <div class="stat-item">Kills: <span id="arena-kills-val" class="stat-value">0</span></div>
+          <div class="stat-item">Zombies Alive: <span id="arena-alive-val" class="stat-value">0</span></div>
+          <div class="stat-item">Ammo: <span id="arena-ammo-val" class="stat-value">30 / ∞</span></div>
+        </div>
+
+        <div id="arena-aim-reticle" style="position:absolute; width:20px; height:20px; border:2px solid rgba(255,50,50,0.8); border-radius:50%; pointer-events:none; transform:translate(-50%, -50%); z-index:8; box-shadow:0 0 4px #ff0000;"></div>
+
+        <button id="arena-fire-btn" style="position:absolute; bottom:30px; right:30px; width:80px; height:80px; background:rgba(255,50,50,0.4); border:2px solid rgba(255,100,100,0.8); border-radius:50%; color:white; font-weight:bold; font-size:18px; z-index:10; touch-action:manipulation;">FIRE</button>
+        <button id="arena-reload-btn" style="position:absolute; bottom:120px; right:40px; width:55px; height:55px; background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.5); border-radius:50%; color:white; font-weight:bold; font-size:12px; z-index:10; touch-action:manipulation;">RELOAD</button>
+
+        <div id="arena-joystick-zone" style="position:absolute; bottom:30px; left:30px; width:120px; height:120px; background:rgba(255,255,255,0.1); border:2px solid rgba(255,255,255,0.2); border-radius:50%; z-index:10;">
+          <div id="arena-joystick-knob" style="position:absolute; top:35px; left:35px; width:50px; height:50px; background:rgba(255,255,255,0.4); border-radius:50%;"></div>
+        </div>
+
+        <div id="arena-health-container" style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:200px; height:16px; background:rgba(0,0,0,0.6); border:2px solid #fff; border-radius:10px; overflow:hidden; z-index:10;">
+          <div id="arena-health-bar" style="width:100%; height:100%; background:#4CAF50; transition:width 0.2s;"></div>
+        </div>
+      `;
+      // Re-assign minimap canvas reference for arena
+      // The minimap canvas in arena is separate, we use it in renderArenaMinimap
+      // But we also need to update the global minimap reference to point to arena's minimap
+      // Actually, we use the same minimap canvas from the main HUD (top-left)
+      // So we just draw on that same canvas
+      // The renderArenaMinimap function uses document.getElementById('minimap-canvas')
+      // But arena has its own minimap canvas with id 'minimap'
+      // We'll use the main minimap canvas for simplicity
+    }
+
+    // Override initArena to setup UI first
+    const originalInitArena = initArena;
+    initArena = function() {
+      setupArenaUI();
+      originalInitArena();
+    };
+
+    // ============================================================
     // GAME INITIALIZATION
     // ============================================================
     function initGame() {
@@ -1383,9 +1475,9 @@
         isGameStarted = true;
         initBattleRoyale();
       } else if (currentMode === 'arena') {
-        topLeftHud.style.display = 'none';
-        crosshair.style.display = 'none';
-        uiLayer.style.display = 'none';
+        topLeftHud.style.display = 'flex'; // Show HUD for arena too
+        crosshair.style.display = 'none'; // Arena has its own reticle
+        uiLayer.style.display = 'none'; // Hide BR controls
         lobbyScreen.style.display = 'none';
         isGameStarted = true;
         initArena();
